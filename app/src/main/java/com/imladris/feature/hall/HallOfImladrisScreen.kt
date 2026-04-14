@@ -2,7 +2,6 @@ package com.imladris.feature.hall
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -17,9 +16,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,7 +26,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.imladris.R
 import com.imladris.core.data.local.entities.ArtifactEntity
+import com.imladris.core.ui.components.ElvenDivider
 import com.imladris.core.ui.components.GlassCard
+import com.imladris.core.ui.components.MajesticBackground
 import com.imladris.core.ui.theme.*
 import com.imladris.feature.library.LibraryViewModel
 
@@ -45,95 +46,91 @@ fun HallOfImladrisScreen(
         uri?.let { libraryViewModel.scanDirectory(it) }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(MidnightBlue, SoftBlack)
-                )
-            )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(24.dp)
-        ) {
-            Spacer(modifier = Modifier.height(48.dp))
-            
-            Text(
-                text = "Sanctuary",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontWeight = FontWeight.Light,
-                    letterSpacing = 2.sp,
-                    fontSize = 48.sp
-                ),
-                color = SilverGlow
-            )
-            
-            Text(
-                text = "Where your journey through knowledge begins",
-                style = MaterialTheme.typography.bodyLarge,
-                color = CelestialBlue.copy(alpha = 0.7f),
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(56.dp))
-            
-            if (recentArtifacts.isNotEmpty()) {
+    MajesticBackground {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp)
+            ) {
+                Spacer(modifier = Modifier.height(64.dp))
+                
                 Text(
-                    text = "Continue Reading",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Champagne,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    text = "SANCTUARY",
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        fontWeight = FontWeight.Light,
+                        letterSpacing = 4.sp,
+                        fontSize = 44.sp
+                    ),
+                    color = SilverGlow
                 )
-                RecentArtifactsRow(recentArtifacts, onArtifactClick)
+                
+                Text(
+                    text = "A mind palace for your digital scrolls",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = CelestialBlue.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                ElvenDivider()
                 Spacer(modifier = Modifier.height(48.dp))
-            }
-
-            Text(
-                text = "Library Overview",
-                style = MaterialTheme.typography.titleMedium,
-                color = Champagne,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            
-            if (recentArtifacts.isEmpty()) {
-                EmptyLibraryPrompt { launcher.launch(null) }
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    ActionCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.FolderOpen,
-                        title = "Import Files",
-                        onClick = { launcher.launch(null) }
+                
+                if (recentArtifacts.isNotEmpty()) {
+                    Text(
+                        text = "JOURNEYS IN PROGRESS",
+                        style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 2.sp),
+                        color = Champagne
                     )
-                    ActionCard(
-                        modifier = Modifier.weight(1f),
-                        icon = Icons.Default.AutoStories,
-                        title = "Statistics",
-                        onClick = { /* Navigate to analytics */ }
-                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    RecentArtifactsRow(recentArtifacts, onArtifactClick)
+                    Spacer(modifier = Modifier.height(48.dp))
                 }
-            }
-            
-            Spacer(modifier = Modifier.height(120.dp))
-        }
 
-        FloatingActionButton(
-            onClick = { launcher.launch(null) },
-            containerColor = CelestialBlue,
-            contentColor = MidnightBlue,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(24.dp),
-            shape = MaterialTheme.shapes.extraLarge
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Add Sanctuary", modifier = Modifier.size(28.dp))
+                Text(
+                    text = "CORRIDORS",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 2.sp),
+                    color = Champagne
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                
+                if (recentArtifacts.isEmpty()) {
+                    EmptyLibraryPrompt { launcher.launch(null) }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        ActionCard(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Default.FolderOpen,
+                            title = "Import Files",
+                            onClick = { launcher.launch(null) }
+                        )
+                        ActionCard(
+                            modifier = Modifier.weight(1f),
+                            icon = Icons.Default.AutoStories,
+                            title = "Insights",
+                            onClick = { /* Navigate to analytics */ }
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(120.dp))
+            }
+
+            FloatingActionButton(
+                onClick = { launcher.launch(null) },
+                containerColor = CelestialBlue,
+                contentColor = MidnightBlue,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(24.dp),
+                shape = MaterialTheme.shapes.extraLarge
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Sanctuary", modifier = Modifier.size(28.dp))
+            }
         }
     }
 }
@@ -149,7 +146,7 @@ fun ActionCard(
         modifier = modifier.clickable(onClick = onClick)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp).fillMaxWidth(),
+            modifier = Modifier.padding(24.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(icon, contentDescription = null, tint = CelestialBlue, modifier = Modifier.size(32.dp))
@@ -172,7 +169,7 @@ fun EmptyLibraryPrompt(onAddClick: () -> Unit) {
             .clickable(onClick = onAddClick)
     ) {
         Column(
-            modifier = Modifier.padding(32.dp),
+            modifier = Modifier.padding(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
@@ -205,14 +202,14 @@ fun RecentArtifactsRow(
     onArtifactClick: (String, String) -> Unit
 ) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
         contentPadding = PaddingValues(horizontal = 4.dp)
     ) {
         items(artifacts) { artifact ->
             GlassCard(
                 modifier = Modifier
-                    .width(180.dp)
-                    .height(260.dp)
+                    .width(200.dp)
+                    .height(280.dp)
                     .clickable { onArtifactClick(artifact.title, artifact.path) }
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -222,29 +219,29 @@ fun RecentArtifactsRow(
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
-                            alpha = 0.4f
+                            alpha = 0.5f
                         )
                     }
                     
-                    Column(modifier = Modifier.align(Alignment.TopStart).padding(16.dp)) {
+                    Column(modifier = Modifier.align(Alignment.TopStart).padding(20.dp)) {
                         Text(
                             text = artifact.title,
                             style = MaterialTheme.typography.titleMedium,
                             color = SilverGlow,
                             maxLines = 4,
-                            lineHeight = 22.sp,
+                            lineHeight = 24.sp,
                             fontWeight = FontWeight.Normal
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = artifact.type.uppercase(),
                             style = MaterialTheme.typography.labelSmall,
-                            color = CelestialBlue.copy(alpha = 0.6f)
+                            color = CelestialBlue.copy(alpha = 0.8f)
                         )
                     }
                     
                     if (artifact.progress >= 0f) {
-                        Column(modifier = Modifier.align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 12.dp)) {
+                        Column(modifier = Modifier.align(Alignment.BottomCenter).padding(horizontal = 20.dp, vertical = 16.dp)) {
                             LinearProgressIndicator(
                                 progress = artifact.progress,
                                 modifier = Modifier

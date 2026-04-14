@@ -24,13 +24,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             ImladrisTheme {
                 val navController = rememberNavController()
-                val items = listOf(Screen.Hall, Screen.Library, Screen.Graph, Screen.Analytics)
+                val items = listOf(Screen.Hall, Screen.Library, Screen.Analytics)
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
                 
                 Scaffold(
                     bottomBar = {
-                        // Only show bottom bar if not in reader
                         if (currentRoute != null && !currentRoute.startsWith("reader")) {
                             NavigationBar(
                                 containerColor = MidnightBlue.copy(alpha = 0.95f),

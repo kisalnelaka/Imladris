@@ -10,7 +10,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.imladris.feature.analytics.AnalyticsScreen
-import com.imladris.feature.graph.KnowledgeGraphScreen
 import com.imladris.feature.hall.HallOfImladrisScreen
 import com.imladris.feature.library.LibraryScreen
 import com.imladris.feature.reader.ReaderScreen
@@ -19,10 +18,9 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
-    object Hall : Screen("hall", "Hall", Icons.Default.Home)
+    object Hall : Screen("hall", "Sanctuary", Icons.Default.Home)
     object Library : Screen("library", "Library", Icons.Default.List)
-    object Graph : Screen("graph", "Graph", Icons.Default.Share)
-    object Analytics : Screen("analytics", "Analytics", Icons.Default.Info)
+    object Analytics : Screen("analytics", "Insights", Icons.Default.Info)
 }
 
 @Composable
@@ -44,9 +42,6 @@ fun ImladrisNavGraph(navController: NavHostController) {
                 }
             )
         }
-        composable(Screen.Graph.route) {
-            KnowledgeGraphScreen()
-        }
         composable(Screen.Analytics.route) {
             AnalyticsScreen()
         }
@@ -63,9 +58,7 @@ fun ImladrisNavGraph(navController: NavHostController) {
             ReaderScreen(
                 title = title,
                 uriString = uri,
-                onBack = { navController.popBackStack() },
-                onLibraryClick = { navController.navigate(Screen.Library.route) },
-                onGraphClick = { navController.navigate(Screen.Graph.route) }
+                onBack = { navController.popBackStack() }
             )
         }
     }

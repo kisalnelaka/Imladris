@@ -12,13 +12,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -31,8 +29,6 @@ fun ReaderScreen(
     title: String,
     uriString: String?,
     onBack: () -> Unit,
-    onLibraryClick: () -> Unit,
-    onGraphClick: () -> Unit,
     viewModel: ReaderViewModel = hiltViewModel()
 ) {
     var isFocusMode by remember { mutableStateOf(false) }
@@ -53,7 +49,6 @@ fun ReaderScreen(
     )
 
     Box(modifier = Modifier.fillMaxSize().background(backgroundColor)) {
-        // Subtle background glow to make it "lively"
         EtherealBackgroundGlow()
 
         Scaffold(
@@ -86,10 +81,7 @@ fun ReaderScreen(
             bottomBar = {
                 ReaderControls(
                     isFocusMode = isFocusMode,
-                    onFocusToggle = { isFocusMode = !isFocusMode },
-                    onHighlightClick = { /* Show toast or snackbar */ },
-                    onConnectClick = onGraphClick,
-                    onLibraryClick = onLibraryClick
+                    onFocusToggle = { isFocusMode = !isFocusMode }
                 )
             },
             containerColor = Color.Transparent
@@ -106,6 +98,7 @@ fun ReaderScreen(
                         .verticalScroll(scrollState)
                         .padding(horizontal = 28.dp, vertical = 24.dp)
                 ) {
+                    // Content only - no hardcoded headers
                     Text(
                         text = content,
                         style = MaterialTheme.typography.bodyLarge.copy(
@@ -179,10 +172,7 @@ fun ReadingVignette(isFocusMode: Boolean) {
 @Composable
 fun ReaderControls(
     isFocusMode: Boolean,
-    onFocusToggle: () -> Unit,
-    onHighlightClick: () -> Unit,
-    onConnectClick: () -> Unit,
-    onLibraryClick: () -> Unit
+    onFocusToggle: () -> Unit
 ) {
     val containerColor by animateColorAsState(
         if (isFocusMode) Color.Transparent else DeepMist.copy(alpha = 0.9f), label = "controls"
@@ -197,15 +187,9 @@ fun ReaderControls(
             modifier = Modifier
                 .padding(24.dp)
                 .navigationBarsPadding(),
-            horizontalArrangement = Arrangement.SpaceAround,
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (!isFocusMode) {
-                ControlIcon(Icons.Default.Edit, "Highlight", onHighlightClick)
-                ControlIcon(Icons.Default.Share, "Connect", onConnectClick)
-                ControlIcon(Icons.Default.CollectionsBookmark, "Library", onLibraryClick)
-            }
-            
             Button(
                 onClick = onFocusToggle,
                 colors = ButtonDefaults.buttonColors(
@@ -223,16 +207,5 @@ fun ReaderControls(
                 Text(if (isFocusMode) stringResource(R.string.reader_exit_focus) else stringResource(R.string.reader_focus_mode))
             }
         }
-    }
-}
-
-@Composable
-fun ControlIcon(
-    icon: androidx.compose.ui.graphics.vector.ImageVector, 
-    label: String,
-    onClick: () -> Unit
-) {
-    IconButton(onClick = onClick) {
-        Icon(icon, contentDescription = label, tint = SilverGlow, modifier = Modifier.size(26.dp))
     }
 }

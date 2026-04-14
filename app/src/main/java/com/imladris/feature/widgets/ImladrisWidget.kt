@@ -74,7 +74,7 @@ class ImladrisWidget : GlanceAppWidget() {
                 ) {
                     Box(
                         modifier = GlanceModifier
-                            .fillMaxWidth() // Simplified for production widget
+                            .fillMaxWidth()
                             .height(2.dp)
                             .background(ColorProvider(CelestialBlue))
                     ) {}

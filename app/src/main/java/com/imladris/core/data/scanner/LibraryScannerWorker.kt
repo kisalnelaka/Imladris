@@ -7,7 +7,7 @@ import androidx.work.WorkerParameters
 import com.imladris.core.data.local.ImladrisDatabase
 import com.imladris.core.data.local.entities.ArtifactEntity
 import com.imladris.core.data.local.entities.FolderEntity
-import java.util.*
+import kotlin.math.absoluteValue
 import javax.inject.Inject
 
 class LibraryScannerWorker(
@@ -35,7 +35,7 @@ class LibraryScannerWorker(
                 name = directory.name ?: "Unknown",
                 path = directory.uri.toString(),
                 parentId = parentId,
-                glowColor = Random().nextInt() // Placeholder for adaptive color
+                glowColor = folderId.hashCode().absoluteValue
             )
         )
 

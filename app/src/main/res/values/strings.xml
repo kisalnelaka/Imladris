@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">IMLADRIS</string>
+    <string name="app_name">Imladris</string>
     <string name="hall_title">Sanctuary</string>
     <string name="hall_subtitle">Where your journey through knowledge begins</string>
     <string name="section_recent_title">Continue Reading</string>

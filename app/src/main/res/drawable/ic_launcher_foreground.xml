@@ -5,53 +5,65 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Subtle Background Glow -->
+    <!-- Deep Background Glow -->
     <path
-        android:pathData="M54,54m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0"
-        android:fillColor="#0858A6FF" />
+        android:pathData="M54,54m-48,0a48,48 0,1 1,96 0a48,48 0,1 1,-96 0"
+        android:fillColor="#0558A6FF" />
 
-    <!-- Ornate Tree Branches (Top half) -->
+    <!-- Majestic Outer Arch -->
     <path
-        android:pathData="M54,40 C50,30 40,25 35,35 M54,40 C58,30 68,25 73,35 M54,50 C45,40 35,45 30,55 M54,50 C63,40 73,45 78,55"
+        android:pathData="M28,84 L28,48 C28,28 40,18 54,18 C68,18 80,28 80,48 L80,84"
         android:strokeWidth="0.8"
-        android:strokeColor="#79C0FF"
-        android:alpha="0.3" />
+        android:strokeColor="#4479C0FF"
+        android:strokeLineCap="round" />
 
-    <!-- Majestic Elven Arch (Matches User Image precisely) -->
+    <!-- Main Elven Arch -->
     <path
-        android:pathData="M34,80 L34,48 C34,34 44,24 54,24 C64,24 74,34 74,48 L74,80"
-        android:strokeWidth="2.5"
+        android:pathData="M32,82 L32,48 C32,32 42,22 54,22 C66,22 76,32 76,48 L76,82"
+        android:strokeWidth="2.2"
         android:strokeColor="#79C0FF"
         android:strokeLineCap="round" />
 
+    <!-- Ornate Internal Tree Filigree -->
     <path
-        android:pathData="M30,82 L30,48 C30,30 42,20 54,20 C66,20 78,30 78,48 L78,82"
-        android:strokeWidth="1"
-        android:strokeColor="#58A6FF"
-        android:strokeLineCap="round"
-        android:alpha="0.5" />
-
-    <!-- Central Glowing Sphere / Aura -->
-    <path
-        android:pathData="M54,54m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0"
-        android:fillColor="#1579C0FF" />
-
-    <!-- The Bright 'I' Rune (Star-like tips) -->
-    <path
-        android:pathData="M54,35 L57,48 L54,72 L51,48 Z"
-        android:fillColor="#F0F6FC" />
-
-    <!-- Outer Glow for the Rune -->
-    <path
-        android:pathData="M54,32 L59,48 L54,75 L49,48 Z"
-        android:fillColor="#79C0FF"
+        android:pathData="M54,42 C50,32 42,28 36,36 M54,42 C58,32 66,28 72,36 M54,52 C46,42 36,46 32,56 M54,52 C62,42 72,46 76,56"
+        android:strokeWidth="0.6"
+        android:strokeColor="#79C0FF"
         android:alpha="0.25" />
 
-    <!-- Bottom Platform Glow -->
     <path
-        android:pathData="M42,80 L66,80"
-        android:strokeWidth="3"
+        android:pathData="M42,65 C40,60 45,55 50,58 M66,65 C68,60 63,55 58,58"
+        android:strokeWidth="0.5"
+        android:strokeColor="#79C0FF"
+        android:alpha="0.2" />
+
+    <!-- Central Glowing Aura -->
+    <path
+        android:pathData="M54,54m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0"
+        android:fillColor="#1A79C0FF" />
+
+    <!-- The 'I' Rune (Star-tipped) -->
+    <!-- Glow layer -->
+    <path
+        android:pathData="M54,30 L59,48 L54,78 L49,48 Z"
+        android:fillColor="#58A6FF"
+        android:alpha="0.3" />
+    <!-- Core layer -->
+    <path
+        android:pathData="M54,33 L57,48 L54,75 L51,48 Z"
+        android:fillColor="#F0F6FC" />
+
+    <!-- Floor / Threshold Glow -->
+    <path
+        android:pathData="M38,82 L70,82"
+        android:strokeWidth="3.5"
         android:strokeColor="#58A6FF"
-        android:alpha="0.4" />
+        android:alpha="0.45" />
+
+    <path
+        android:pathData="M44,85 L64,85"
+        android:strokeWidth="1.5"
+        android:strokeColor="#79C0FF"
+        android:alpha="0.3" />
 
 </vector>
