@@ -2,86 +2,86 @@ package com.imladris.feature.graph
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
 import com.imladris.core.ui.theme.EtherealTeal
 import com.imladris.core.ui.theme.SilverGlow
 import com.imladris.core.ui.theme.SoftGold
 
-data class GraphNode(val id: String, val label: String, var position: Offset)
-data class GraphEdge(val fromId: String, val toId: String)
-
 @Composable
 fun KnowledgeGraphScreen() {
+    var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    var zoom by remember { mutableStateOf(1f) }
-    
-    val nodes = remember {
-        listOf(
-            GraphNode("1", "The Hobbit", Offset(300f, 400f)),
-            GraphNode("2", "The Silmarillion", Offset(600f, 300f)),
-            GraphNode("3", "Unfinished Tales", Offset(500f, 600f)),
-            GraphNode("4", "Lost Road", Offset(800f, 500f))
-        )
-    }
-    
-    val edges = remember {
-        listOf(
-            GraphEdge("1", "2"),
-            GraphEdge("2", "3"),
-            GraphEdge("3", "4"),
-            GraphEdge("2", "4")
-        )
-    }
 
-    Canvas(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                detectTransformGestures { _, pan, gestureZoom, _ ->
+                detectTransformGestures { _, pan, zoom, _ ->
+                    scale *= zoom
                     offset += pan
-                    zoom *= gestureZoom
                 }
             }
     ) {
-        // Draw Edges (Links)
-        edges.forEach { edge ->
-            val from = nodes.find { it.id == edge.fromId }?.position ?: Offset.Zero
-            val to = nodes.find { it.id == edge.toId }?.position ?: Offset.Zero
-            
-            drawLine(
-                color = EtherealTeal.copy(alpha = 0.3f),
-                start = (from + offset) * zoom,
-                end = (to + offset) * zoom,
-                strokeWidth = 2f
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            // Draw connections (constellations)
+            val nodes = listOf(
+                Offset(300f, 400f),
+                Offset(600f, 700f),
+                Offset(200f, 900f),
+                Offset(800f, 300f),
+                Offset(500f, 200f)
             )
+
+            nodes.forEachIndexed { index, start ->
+                nodes.drop(index + 1).forEach { end ->
+                    drawLine(
+                        color = EtherealTeal.copy(alpha = 0.2f),
+                        start = (start * scale) + offset,
+                        end = (end * scale) + offset,
+                        strokeWidth = 1.dp.toPx()
+                    )
+                }
+            }
+
+            // Draw nodes
+            nodes.forEach { node ->
+                drawCircle(
+                    color = SoftGold,
+                    radius = 8.dp.toPx() * scale,
+                    center = (node * scale) + offset
+                )
+                drawCircle(
+                    color = SoftGold.copy(alpha = 0.3f),
+                    radius = 16.dp.toPx() * scale,
+                    center = (node * scale) + offset
+                )
+            }
         }
 
-        // Draw Nodes (Artifacts)
-        nodes.forEach { node ->
-            val pos = (node.position + offset) * zoom
-            
-            // Outer glow
-            drawCircle(
-                color = SoftGold.copy(alpha = 0.2f),
-                radius = 40f * zoom,
-                center = pos
-            )
-            
-            // Core node
-            drawCircle(
-                color = SoftGold,
-                radius = 10f * zoom,
-                center = pos,
-                style = Stroke(width = 2f)
-            )
-            
-            // We could add text here using native canvas text or a specialized helper
-        }
+        Text(
+            text = "Knowledge Graph",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                shadow = Shadow(color = SoftGold, blurRadius = 8f)
+            ),
+            modifier = Modifier.padding(24.dp)
+        )
+        
+        Text(
+            text = "Explore the connections between your thoughts",
+            style = MaterialTheme.typography.bodyLarge,
+            color = SilverGlow.copy(alpha = 0.6f),
+            modifier = Modifier.padding(start = 24.dp, top = 64.dp)
+        )
     }
 }

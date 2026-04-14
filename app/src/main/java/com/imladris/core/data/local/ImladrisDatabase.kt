@@ -15,10 +15,10 @@ interface LibraryDao {
     @Query("SELECT * FROM artifacts WHERE parentFolderId = :folderId")
     fun getArtifactsIn(folderId: String): Flow<List<ArtifactEntity>>
 
-    @Insert(onConflict = OnConflictAlignment.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFolder(folder: FolderEntity)
 
-    @Insert(onConflict = OnConflictAlignment.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertArtifact(artifact: ArtifactEntity)
 
     @Query("SELECT * FROM artifacts ORDER BY lastRead DESC LIMIT 5")

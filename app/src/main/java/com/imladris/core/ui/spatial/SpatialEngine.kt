@@ -17,7 +17,7 @@ fun SpatialArtifact(
     content: @Composable () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "floating")
-    val translationY by infiniteTransition.animateFloat(
+    val animatedY by infiniteTransition.animateFloat(
         initialValue = -8f,
         targetValue = 8f,
         animationSpec = infiniteRepeatable(
@@ -31,9 +31,9 @@ fun SpatialArtifact(
         modifier = modifier
             .padding(16.dp)
             .graphicsLayer {
-                translationY = translationY.dp.toPx()
+                translationY = animatedY.dp.toPx()
                 // Subtle rotation for "ethereal" feel
-                rotationZ = translationY / 4
+                rotationZ = animatedY / 4
             }
     ) {
         content()
@@ -41,5 +41,5 @@ fun SpatialArtifact(
 }
 
 private val SineEaseInOut = Easing { fraction ->
-    ((1 - Math.cos(fraction * Math.PI)) / 2).toFloat()
+    ((1 - Math.cos(fraction * Math.PI.toDouble())) / 2).toFloat()
 }

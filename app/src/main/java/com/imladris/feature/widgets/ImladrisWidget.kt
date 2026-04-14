@@ -1,48 +1,55 @@
 package com.imladris.feature.widgets
 
 import android.content.Context
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.GlanceId
-import androidx.glance.GlanceModifier
+import androidx.glance.*
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
-import androidx.glance.background
 import androidx.glance.layout.*
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.imladris.core.di.WidgetEntryPoint
 import com.imladris.core.ui.theme.MidnightBlue
 import com.imladris.core.ui.theme.SilverGlow
-import com.imladris.core.ui.theme.SoftGold
+import com.imladris.core.ui.theme.CelestialBlue
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.first
 
 class ImladrisWidget : GlanceAppWidget() {
-    override suspend fun provideContent(context: Context, id: GlanceId) {
-        // In a real app, fetch data from Room or DataStore
-        val currentBook = "The Fellowship of the Ring"
-        val progress = 0.45f
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val repository = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            WidgetEntryPoint::class.java
+        ).libraryRepository()
+
+        val recentArtifact = repository.getRecentArtifacts().first().firstOrNull()
+        val currentBook = recentArtifact?.title ?: "No active journeys"
+        val progress = recentArtifact?.progress ?: 0.0f
 
         provideContent {
             GlanceThemeContent(currentBook, progress)
         }
     }
 
-    @androidx.compose.runtime.Composable
+    @Composable
     private fun GlanceThemeContent(bookTitle: String, progress: Float) {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(ColorProvider(MidnightBlue))
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalAlignment = Alignment.Start
+            verticalAlignment = Alignment.Vertical.CenterVertically,
+            horizontalAlignment = Alignment.Horizontal.Start
         ) {
             Text(
-                text = "CONINUE READING",
+                text = "SANCTUARY",
                 style = TextStyle(
-                    color = ColorProvider(SoftGold),
+                    color = ColorProvider(CelestialBlue),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -52,25 +59,26 @@ class ImladrisWidget : GlanceAppWidget() {
                 text = bookTitle,
                 style = TextStyle(
                     color = ColorProvider(SilverGlow),
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
             )
-            Spacer(modifier = GlanceModifier.height(12.dp))
             
-            // Minimal progress bar representation
-            Box(
-                modifier = GlanceModifier
-                    .fillMaxWidth()
-                    .height(4.dp)
-                    .background(ColorProvider(SilverGlow.copy(alpha = 0.2f)))
-            ) {
+            if (progress > 0) {
+                Spacer(modifier = GlanceModifier.height(12.dp))
                 Box(
                     modifier = GlanceModifier
-                        .fillMaxWidth(progress)
-                        .height(4.dp)
-                        .background(ColorProvider(SoftGold))
-                )
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .background(ColorProvider(SilverGlow.copy(alpha = 0.1f)))
+                ) {
+                    Box(
+                        modifier = GlanceModifier
+                            .fillMaxWidth() // Simplified for production widget
+                            .height(2.dp)
+                            .background(ColorProvider(CelestialBlue))
+                    ) {}
+                }
             }
         }
     }

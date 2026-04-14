@@ -1,20 +1,26 @@
 package com.imladris.core.notifications
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.imladris.core.data.local.ImladrisDatabase
-import com.imladris.core.notifications.ImladrisNotifications
+import dagger.assisted.Assisted
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
+import dagger.assisted.AssistedInject
 
-class MemoryRecallWorker(
-    context: Context,
-    params: WorkerParameters,
+@HiltWorker
+class MemoryRecallWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
     private val database: ImladrisDatabase
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        // Fetch a random highlight from the database
         val artifacts = database.libraryDao().getRecentArtifacts().first()
         if (artifacts.isEmpty()) return Result.success()
 
@@ -29,7 +35,6 @@ class MemoryRecallWorker(
                 recall.content
             )
         } else {
-            // If no highlights, maybe just a reminder about the book
             ImladrisNotifications.showGuidanceNotification(
                 applicationContext,
                 "The halls of Imladris remind you of ${randomArtifact.title}"

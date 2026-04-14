@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IMLADRIS</string>
+    <string name="hall_title">Sanctuary</string>
+    <string name="hall_subtitle">Where your journey through knowledge begins</string>
+    <string name="section_recent_title">Continue Reading</string>
+    <string name="section_overview_title">Library Overview</string>
+    <string name="action_import">Import Files</string>
+    <string name="action_stats">Statistics</string>
+    <string name="library_title">Library</string>
+    <string name="library_subtitle">Traverse the corridors of wisdom</string>
+    <string name="reader_focus_mode">Deep Focus</string>
+    <string name="reader_exit_focus">Awaken</string>
+    <string name="add_sanctuary">Add Sanctuary</string>
+    <string name="empty_hall_title">Awaiting Enlightenment</string>
+    <string name="empty_hall_desc">Select a scroll-directory to fill these halls with wisdom.</string>
+    <string name="no_artifacts_found">No artifacts found in this sanctuary.</string>
+</resources>

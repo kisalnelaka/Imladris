@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Ethereal Background Glow -->
+    <path
+        android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"
+        android:fillColor="#1558A6FF" />
+
+    <!-- Stylized Elven Arch / Gateway -->
+    <path
+        android:pathData="M30,80 L30,45 C30,30 40,20 54,20 C68,20 78,30 78,45 L78,80"
+        android:strokeWidth="3"
+        android:strokeColor="#C9D1D9"
+        android:strokeLineCap="round" />
+
+    <!-- Inner Portal / Knowledge Tree Base -->
+    <path
+        android:pathData="M45,80 L54,60 L63,80"
+        android:strokeWidth="2.5"
+        android:strokeColor="#58A6FF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Glowing Star / Spark of Wisdom -->
+    <path
+        android:pathData="M54,35 L56,41 L62,41 L57,45 L59,51 L54,47 L49,51 L51,45 L46,41 L52,41 Z"
+        android:fillColor="#F0F6FC" />
+
+</vector>

@@ -4,9 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -24,7 +21,7 @@ fun GlassCard(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(28.dp))
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
@@ -41,9 +38,9 @@ fun GlassCard(
                         Color.Transparent
                     )
                 ),
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(28.dp)
             )
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
         Column {
             content()
@@ -57,13 +54,31 @@ fun EtherealGlow(
     color: Color = Color(0xFF64FFDA),
     content: @Composable () -> Unit
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier, contentAlignment = androidx.compose.ui.Alignment.Center) {
         Box(
             modifier = Modifier
-                .matchParentSize()
-                .blur(32.dp)
-                .background(color.copy(alpha = 0.15f), RoundedCornerShape(100))
+                .size(120.dp)
+                .blur(48.dp)
+                .background(color.copy(alpha = 0.25f), RoundedCornerShape(100))
         )
         content()
     }
+}
+
+@Composable
+fun ImladrisDivider(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(
+                Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        Color(0xFFD4AF37).copy(alpha = 0.5f),
+                        Color.Transparent
+                    )
+                )
+            )
+    )
 }

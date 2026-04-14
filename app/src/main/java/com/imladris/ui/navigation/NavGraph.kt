@@ -5,16 +5,21 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.imladris.feature.analytics.AnalyticsScreen
 import com.imladris.feature.graph.KnowledgeGraphScreen
 import com.imladris.feature.hall.HallOfImladrisScreen
+import com.imladris.feature.library.LibraryScreen
 import com.imladris.feature.reader.ReaderScreen
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Hall : Screen("hall", "Hall", Icons.Default.Home)
@@ -27,7 +32,20 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
 fun ImladrisNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.Hall.route) {
         composable(Screen.Hall.route) {
-            HallOfImladrisScreen()
+            HallOfImladrisScreen(
+                onArtifactClick = { title, uri ->
+                    val encodedUri = URLEncoder.encode(uri, StandardCharsets.UTF_8.toString())
+                    navController.navigate("reader/$title/$encodedUri")
+                }
+            )
+        }
+        composable(Screen.Library.route) {
+            LibraryScreen(
+                onArtifactClick = { title, uri ->
+                    val encodedUri = URLEncoder.encode(uri, StandardCharsets.UTF_8.toString())
+                    navController.navigate("reader/$title/$encodedUri")
+                }
+            )
         }
         composable(Screen.Graph.route) {
             KnowledgeGraphScreen()
@@ -35,9 +53,17 @@ fun ImladrisNavGraph(navController: NavHostController) {
         composable(Screen.Analytics.route) {
             AnalyticsScreen()
         }
-        composable("reader/{title}") { backStackEntry ->
+        composable(
+            route = "reader/{title}/{uri}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType },
+                navArgument("uri") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
             val title = backStackEntry.arguments?.getString("title") ?: "Untitled"
-            ReaderScreen(title)
+            val encodedUri = backStackEntry.arguments?.getString("uri")
+            val uri = encodedUri?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.toString()) }
+            ReaderScreen(title, uri)
         }
     }
 }
