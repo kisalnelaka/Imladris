@@ -1,36 +1,58 @@
+# Android defaults
 *.iml
-.gradle
+.gradle/
 /local.properties
+local.properties
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+.idea/
 .DS_Store
+Thumbs.db
+
+# Build outputs
 /build
-/captures
+/app/build
+build/
+out/
+gen/
+bin/
+captures/
+
+# Native
 .externalNativeBuild
 .cxx
-local.properties
-/app/build
-.idea/*.xml
-!app/*.xml
-!app/src/main/res/xml/*.xml
+
+# Android packaging
 *.apk
 *.ap_
-*.dex
+*.aab
+
+# JVM
 *.class
-bin/
-gen/
-out/
-.idea/
-.gradle/
-build/
+*.dex
+*.jar
+
+# Kotlin
+*.kotlin
+
+# Editor temp files
 *.bak
 *~
 *.swp
 *.log
-.DS_Store
-Thumbs.db
+
+# Profiling & memory dumps
 *.hprof
+
+# Secrets (NEVER commit these)
+google-services.json
+keystore.jks
+*.keystore
+signing.properties
+
+# Stray project directories (not part of Android module)
+backend/

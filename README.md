@@ -1,75 +1,113 @@
 # IMLADRIS
 
-**IMLADRIS** is an ethereal, offline-first Android library and knowledge sanctuary. Inspired by the architectural elegance of Rivendell, it transforms digital bookshelves into a majestic, intelligent space for deep reading and reflection.
+**An ethereal, offline-first Android library and knowledge sanctuary.**
 
 ![Imladris Feature Graphic](docs/assets/feature_graphic.png)
 
-## Core Philosophy
-Imladris is built upon the concept of a **Mind Palace**. It treats every document not as a file, but as an artifact of knowledge.
+---
 
-- **Spatial Sanctuary**: A UI that breathes. Floating elements, glassmorphic layers, and soft glows create a calm environment that minimizes cognitive load.
-- **Neural Wisdom**: The Knowledge Graph visualizes how your ideas interlink, evolving your collection into a living memory system.
-- **Privacy by Design**: Fully offline. No cloud syncing, no trackers. Your sanctuary resides entirely within your device via the Android System Access Framework (SAF).
+IMLADRIS is not a file manager. It is a **Mind Palace** — an intelligent space that treats every document as an artifact of knowledge, every folder as a glowing gateway, and the act of reading as a journey worth remembering.
 
-## Technical Architecture
-Imladris follows **Clean Architecture** principles to ensure long-term stability and high performance.
-
-```mermaid
-graph TD
-    UI[Presentation / Compose] --> Domain[Domain / Models & UseCases]
-    Domain --> Data[Data / Room & SAF]
-    Data --> RoomDB[(SQLite / Room)]
-    Data --> Storage[Local Storage / SAF]
-    Worker[Scanner / WorkManager] --> Data
-```
-
-## Key Features
-- **Spatial UI Engine**: Recursive folder navigation through glowing 'Gateways' and floating 'Artifacts'.
-- **Knowledge Graph**: Majestic canvas-based node-link diagram with fluid pan/zoom.
-- **Ethereal Reader**: Optimized for focus with Playfair Display (Serif) typography and a dedicated Focus Mode.
-- **Intelligent Analytics**: Reading focus scores, intellectual timelines, and session tracking.
-- **Memory Recall System**: Context-aware, non-intrusive notifications that resurface highlights.
-- **Sanctuary Widgets**: Jetpack Glance integration for immediate session resumption.
-
-## Project Structure
-```text
-com.imladris
-├── core
-│   ├── data        # Repositories, Room DB, SAF Scanner
-│   ├── domain      # Sealed Domain Models, Repository Interfaces
-│   ├── notifications # WorkManager Recall Logic, Notification Channels
-│   ├── ui          # Design System, Glassmorphic Components, Spatial Engine
-│   └── di          # Hilt Dependency Injection Modules
-├── feature
-│   ├── hall        # Dashboard / Landing Sanctuary
-│   ├── library     # Spatial Folder Browser
-│   ├── graph       # Knowledge Visualization Canvas
-│   ├── reader      # Ethereal Reading Experience
-│   └── analytics   # Knowledge Insights & Timeline
-└── ui.navigation   # Type-safe Compose Navigation
-```
-
-## Getting Started
-### Prerequisites
-- Android Studio Iguana (2023.2.1) or newer
-- JDK 17
-- Android SDK Level 34
-
-### Build & Release
-Imladris is configured for automated build management. Upon building, the output artifact is automatically renamed to reflect the current version:
-```powershell
-# To build the release APK
-.\gradlew assembleRelease
-# Output: app/build/outputs/apk/release/Imladris-v1.0.apk
-```
-
-## Visual Identity
-| Sanctuary Icon | Brand Aesthetic |
-|---|---|
-| ![App Icon](docs/assets/app_icon.png) | **Midnight Blue**, **Ancient Silver**, and **Soft Gold** palette. |
-
-## License
-MIT License - Copyright (c) 2024 IMLADRIS Open Source Project.
+Inspired by the architecture of Rivendell, IMLADRIS brings together glassmorphic design, spatial navigation, and adaptive intelligence into a single, calm, majestic experience.
 
 ---
-"Deep roots are not reached by the frost."
+
+## Architecture
+
+```
+Presentation (Jetpack Compose)
+        |
+   Domain Layer
+  (Models, UseCases)
+        |
+    Data Layer
+ (Room DB, SAF Scanner)
+        |
+  Local Database + Storage
+```
+
+**Stack:** Kotlin · Jetpack Compose · Jetpack Glance · Hilt · Room · WorkManager · Clean Architecture
+
+**Minimum SDK:** 26 (Android 8.0) · **Target SDK:** 34
+
+---
+
+## Features
+
+**Spatial Navigation**
+Navigate your library through luminous Gateways — each folder is a portal to a themed collection of knowledge. Books float as Artifacts within each realm.
+
+**Knowledge Graph**
+A canvas-rendered node-link diagram that maps connections between your artifacts. Nodes pulse larger as you progress through a book. Supports pinch-to-zoom and pan gestures.
+
+**Ethereal Reader**
+A distraction-free reading environment built for long sessions. Playfair Display serif typography, adaptive brightness, and a Focus Mode that fades all UI chrome to reveal only text.
+
+**Memory Recall**
+The sanctuary remembers what you have read. Calm, non-intrusive WorkManager-scheduled notifications resurface highlights at your preferred reading hour — never more than twice a day.
+
+**Reading Analytics**
+Track focus scores, reading streaks, and a chronological timeline of your intellectual journey.
+
+**Home Screen Widgets**
+Jetpack Glance-powered widgets for immediately resuming your current book or reflecting on a recalled highlight — without opening the app.
+
+---
+
+## Project Structure
+
+```
+com.imladris
+├── core
+│   ├── data           # Room DB, SAF Library Scanner, Repository implementations
+│   ├── domain         # Sealed models, Repository interfaces
+│   ├── notifications  # WorkManager workers, Notification channels
+│   ├── ui             # Design system, Glassmorphic components, Spatial engine
+│   └── di             # Hilt modules and Widget entry points
+├── feature
+│   ├── hall           # Dashboard — The Hall of Imladris
+│   ├── library        # Spatial folder browser
+│   ├── graph          # Knowledge Graph canvas
+│   ├── reader         # Ethereal reading experience
+│   ├── analytics      # Focus scores, timelines
+│   └── widgets        # Glance home screen widgets
+└── ui.navigation      # Type-safe Compose NavGraph
+```
+
+---
+
+## Getting Started
+
+**Prerequisites:** Android Studio Iguana+, JDK 17, Android SDK 34
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/imladris.git
+
+# Open in Android Studio, let Gradle sync, then:
+./gradlew assembleDebug
+
+# Output: app/build/outputs/apk/debug/Imladris-v1.0.apk
+```
+
+On first launch, tap the **+** button to select your root library folder. IMLADRIS will recursively scan and populate your sanctuary.
+
+---
+
+## Visual Identity
+
+| App Icon | Palette |
+|---|---|
+| ![App Icon](docs/assets/app_icon.png) | **Midnight** `#0A0E14` · **Silver** `#E1E8ED` · **Gold** `#D4AF37` · **Teal** `#64FFDA` |
+
+A full icon specification (adaptive layers, monochrome, notification glyph) is available in [`docs/icon_specs.md`](docs/icon_specs.md).
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
+
+*"Deep roots are not reached by the frost."*
