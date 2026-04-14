@@ -65,7 +65,7 @@ class MemoryRecallWidget : GlanceAppWidget() {
                 )
                 Spacer(modifier = GlanceModifier.height(8.dp))
                 Text(
-                    text = "— $source",
+                    text = "- $source",
                     style = TextStyle(
                         color = ColorProvider(SilverGlow.copy(alpha = 0.6f)),
                         fontSize = 12.sp
