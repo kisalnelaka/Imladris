@@ -19,12 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.imladris.R
 import com.imladris.core.data.local.entities.ArtifactEntity
 import com.imladris.core.ui.components.GlassCard
@@ -131,8 +131,7 @@ fun HallOfImladrisScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp),
-            shape = MaterialTheme.shapes.extraLarge,
-            elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 8.dp)
+            shape = MaterialTheme.shapes.extraLarge
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add Sanctuary", modifier = Modifier.size(28.dp))
         }
@@ -194,7 +193,7 @@ fun EmptyLibraryPrompt(onAddClick: () -> Unit) {
                 text = "Select a scroll-directory to fill these halls with wisdom.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = SilverGlow.copy(alpha = 0.5f),
-                textAlign = TextAlign.Center
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
         }
     }
@@ -216,8 +215,18 @@ fun RecentArtifactsRow(
                     .height(260.dp)
                     .clickable { onArtifactClick(artifact.title, artifact.path) }
             ) {
-                Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                    Column(modifier = Modifier.align(Alignment.TopStart)) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    if (artifact.coverPath != null) {
+                        AsyncImage(
+                            model = artifact.coverPath,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            alpha = 0.4f
+                        )
+                    }
+                    
+                    Column(modifier = Modifier.align(Alignment.TopStart).padding(16.dp)) {
                         Text(
                             text = artifact.title,
                             style = MaterialTheme.typography.titleMedium,
@@ -235,7 +244,7 @@ fun RecentArtifactsRow(
                     }
                     
                     if (artifact.progress >= 0f) {
-                        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        Column(modifier = Modifier.align(Alignment.BottomCenter).padding(horizontal = 16.dp, vertical = 12.dp)) {
                             LinearProgressIndicator(
                                 progress = artifact.progress,
                                 modifier = Modifier

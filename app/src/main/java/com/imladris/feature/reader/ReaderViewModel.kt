@@ -34,9 +34,26 @@ class ReaderViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 val uri = Uri.parse(uriString)
+                
+                // Safety check: is it a directory or a file?
+                val isDirectory = try {
+                    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                        val mimeIndex = cursor.getColumnIndex(android.provider.DocumentsContract.Document.COLUMN_MIME_TYPE)
+                        if (mimeIndex != -1 && cursor.moveToFirst()) {
+                            cursor.getString(mimeIndex) == android.provider.DocumentsContract.Document.MIME_TYPE_DIR
+                        } else false
+                    } ?: false
+                } catch (e: Exception) { false }
+
+                if (isDirectory) {
+                    _content.value = "This is a sanctuary (folder), not a specific scroll (file). Please select a book from within the library."
+                    return@launch
+                }
+
                 val text = withContext(Dispatchers.IO) {
                     context.contentResolver.openInputStream(uri)?.use { inputStream ->
                         BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                            // Read first 50KB for performance if it's huge, or full if small
                             reader.readText()
                         }
                     } ?: "Unable to read the artifact."

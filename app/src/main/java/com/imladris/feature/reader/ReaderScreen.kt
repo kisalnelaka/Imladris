@@ -1,7 +1,7 @@
 package com.imladris.feature.reader
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -29,6 +30,9 @@ import com.imladris.core.ui.theme.*
 fun ReaderScreen(
     title: String,
     uriString: String?,
+    onBack: () -> Unit,
+    onLibraryClick: () -> Unit,
+    onGraphClick: () -> Unit,
     viewModel: ReaderViewModel = hiltViewModel()
 ) {
     var isFocusMode by remember { mutableStateOf(false) }
@@ -43,10 +47,15 @@ fun ReaderScreen(
     }
 
     val backgroundColor by animateColorAsState(
-        if (isFocusMode) SoftBlack else MidnightBlue, label = "bg"
+        if (isFocusMode) SoftBlack else MidnightBlue, 
+        animationSpec = tween(1000),
+        label = "bg"
     )
 
     Box(modifier = Modifier.fillMaxSize().background(backgroundColor)) {
+        // Subtle background glow to make it "lively"
+        EtherealBackgroundGlow()
+
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -61,7 +70,7 @@ fun ReaderScreen(
                         containerColor = Color.Transparent
                     ),
                     navigationIcon = {
-                        IconButton(onClick = { /* Handle back in NavGraph */ }) {
+                        IconButton(onClick = onBack) {
                             Icon(Icons.Default.ArrowBack, contentDescription = null, tint = SilverGlow)
                         }
                     },
@@ -77,7 +86,10 @@ fun ReaderScreen(
             bottomBar = {
                 ReaderControls(
                     isFocusMode = isFocusMode,
-                    onFocusToggle = { isFocusMode = !isFocusMode }
+                    onFocusToggle = { isFocusMode = !isFocusMode },
+                    onHighlightClick = { /* Show toast or snackbar */ },
+                    onConnectClick = onGraphClick,
+                    onLibraryClick = onLibraryClick
                 )
             },
             containerColor = Color.Transparent
@@ -102,7 +114,11 @@ fun ReaderScreen(
                             fontSize = fontSize.sp,
                             letterSpacing = 0.5.sp
                         ),
-                        color = animateColorAsState(if (isFocusMode) Moonlight else SilverGlow, label = "textColor").value,
+                        color = animateColorAsState(
+                            if (isFocusMode) Moonlight else SilverGlow, 
+                            animationSpec = tween(800),
+                            label = "textColor"
+                        ).value,
                         modifier = Modifier.fillMaxWidth()
                     )
                     
@@ -116,8 +132,35 @@ fun ReaderScreen(
 }
 
 @Composable
+fun EtherealBackgroundGlow() {
+    val infiniteTransition = rememberInfiniteTransition(label = "glow")
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.05f,
+        targetValue = 0.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "alpha"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer { this.alpha = alpha }
+            .background(
+                Brush.radialGradient(
+                    colors = listOf(CelestialBlue, Color.Transparent),
+                    center = androidx.compose.ui.geometry.Offset(200f, 200f),
+                    radius = 800f
+                )
+            )
+    )
+}
+
+@Composable
 fun ReadingVignette(isFocusMode: Boolean) {
-    val alpha by animateFloatAsState(if (isFocusMode) 0.8f else 0.4f, label = "vignette")
+    val alpha by animateFloatAsState(if (isFocusMode) 0.9f else 0.4f, animationSpec = tween(1000), label = "vignette")
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -125,8 +168,8 @@ fun ReadingVignette(isFocusMode: Boolean) {
             .background(
                 Brush.verticalGradient(
                     0f to MidnightBlue,
-                    0.2f to Color.Transparent,
-                    0.8f to Color.Transparent,
+                    0.15f to Color.Transparent,
+                    0.85f to Color.Transparent,
                     1f to MidnightBlue
                 )
             )
@@ -134,7 +177,13 @@ fun ReadingVignette(isFocusMode: Boolean) {
 }
 
 @Composable
-fun ReaderControls(isFocusMode: Boolean, onFocusToggle: () -> Unit) {
+fun ReaderControls(
+    isFocusMode: Boolean,
+    onFocusToggle: () -> Unit,
+    onHighlightClick: () -> Unit,
+    onConnectClick: () -> Unit,
+    onLibraryClick: () -> Unit
+) {
     val containerColor by animateColorAsState(
         if (isFocusMode) Color.Transparent else DeepMist.copy(alpha = 0.9f), label = "controls"
     )
@@ -152,9 +201,9 @@ fun ReaderControls(isFocusMode: Boolean, onFocusToggle: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (!isFocusMode) {
-                ControlIcon(Icons.Default.Edit, "Highlight")
-                ControlIcon(Icons.Default.Share, "Connect")
-                ControlIcon(Icons.Default.CollectionsBookmark, "Library")
+                ControlIcon(Icons.Default.Edit, "Highlight", onHighlightClick)
+                ControlIcon(Icons.Default.Share, "Connect", onConnectClick)
+                ControlIcon(Icons.Default.CollectionsBookmark, "Library", onLibraryClick)
             }
             
             Button(
@@ -178,10 +227,12 @@ fun ReaderControls(isFocusMode: Boolean, onFocusToggle: () -> Unit) {
 }
 
 @Composable
-fun ControlIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        IconButton(onClick = {}) {
-            Icon(icon, contentDescription = label, tint = SilverGlow, modifier = Modifier.size(26.dp))
-        }
+fun ControlIcon(
+    icon: androidx.compose.ui.graphics.vector.ImageVector, 
+    label: String,
+    onClick: () -> Unit
+) {
+    IconButton(onClick = onClick) {
+        Icon(icon, contentDescription = label, tint = SilverGlow, modifier = Modifier.size(26.dp))
     }
 }

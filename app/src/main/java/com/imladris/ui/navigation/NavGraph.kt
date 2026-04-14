@@ -1,12 +1,9 @@
 package com.imladris.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -63,7 +60,13 @@ fun ImladrisNavGraph(navController: NavHostController) {
             val title = backStackEntry.arguments?.getString("title") ?: "Untitled"
             val encodedUri = backStackEntry.arguments?.getString("uri")
             val uri = encodedUri?.let { URLDecoder.decode(it, StandardCharsets.UTF_8.toString()) }
-            ReaderScreen(title, uri)
+            ReaderScreen(
+                title = title,
+                uriString = uri,
+                onBack = { navController.popBackStack() },
+                onLibraryClick = { navController.navigate(Screen.Library.route) },
+                onGraphClick = { navController.navigate(Screen.Graph.route) }
+            )
         }
     }
 }
