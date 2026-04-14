@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
-import android.os.ParcelFileDescriptor
 import androidx.documentfile.provider.DocumentFile
 import com.imladris.core.data.local.LibraryDao
 import com.imladris.core.data.local.entities.ArtifactEntity
@@ -38,11 +37,12 @@ class LibraryRepository @Inject constructor(
     }
 
     private suspend fun scanRecursive(document: DocumentFile, parentId: String?) {
+        // Strict distinction between directories and files
         if (document.isDirectory) {
             val folderId = UUID.randomUUID().toString()
             val folder = FolderEntity(
                 id = folderId,
-                name = document.name ?: "Unknown",
+                name = document.name ?: "Unknown Sanctuary",
                 path = document.uri.toString(),
                 parentId = parentId,
                 glowColor = 0xFF64FFDA.toInt()
@@ -52,9 +52,11 @@ class LibraryRepository @Inject constructor(
             document.listFiles().forEach { child ->
                 scanRecursive(child, folderId)
             }
-        } else {
+        } else if (document.isFile) {
             val name = document.name ?: return
             val lowerName = name.lowercase()
+            
+            // Only index valid document files, excluding directories that might have extensions
             if (lowerName.endsWith(".txt") || lowerName.endsWith(".pdf") || lowerName.endsWith(".epub")) {
                 
                 var coverPath: String? = null
@@ -102,7 +104,6 @@ class LibraryRepository @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
             null
         }
     }
