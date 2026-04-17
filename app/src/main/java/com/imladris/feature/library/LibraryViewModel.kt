@@ -21,7 +21,7 @@ class LibraryViewModel @Inject constructor(
 
     val rootFolders: Flow<List<FolderEntity>> = repository.getRootFolders()
     
-    val recentArtifacts: Flow<List<ArtifactEntity>> = repository.getRecentArtifacts()
+    val recentlyOpened: Flow<List<ArtifactEntity>> = repository.getRecentlyOpened()
 
     fun getFoldersIn(parentId: String): Flow<List<FolderEntity>> = repository.getFoldersIn(parentId)
     

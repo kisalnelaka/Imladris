@@ -2,17 +2,20 @@ package com.imladris.core.data.scanner
 
 import android.content.Context
 import androidx.documentfile.provider.DocumentFile
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.imladris.core.data.local.ImladrisDatabase
 import com.imladris.core.data.local.entities.ArtifactEntity
 import com.imladris.core.data.local.entities.FolderEntity
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlin.math.absoluteValue
-import javax.inject.Inject
 
-class LibraryScannerWorker(
-    context: Context,
-    params: WorkerParameters,
+@HiltWorker
+class LibraryScannerWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
     private val database: ImladrisDatabase
 ) : CoroutineWorker(context, params) {
 
@@ -32,7 +35,7 @@ class LibraryScannerWorker(
         database.libraryDao().insertFolder(
             FolderEntity(
                 id = folderId,
-                name = directory.name ?: "Unknown",
+                name = directory.name ?: "Sanctuary",
                 path = directory.uri.toString(),
                 parentId = parentId,
                 glowColor = folderId.hashCode().absoluteValue
@@ -52,7 +55,8 @@ class LibraryScannerWorker(
                             path = file.uri.toString(),
                             type = getFileType(file.name),
                             coverPath = null,
-                            lastRead = 0,
+                            lastRead = 0L,
+                            addedDate = System.currentTimeMillis(),
                             progress = 0f,
                             parentFolderId = folderId
                         )
@@ -64,7 +68,7 @@ class LibraryScannerWorker(
 
     private fun isSupportFileType(name: String?): Boolean {
         return name?.let { 
-            it.endsWith(".pdf", true) || it.endsWith(".epub", true) || it.endsWith(".md", true)
+            it.endsWith(".pdf", true) || it.endsWith(".epub", true) || it.endsWith(".txt", true)
         } ?: false
     }
 
@@ -72,7 +76,7 @@ class LibraryScannerWorker(
         return when {
             name?.endsWith(".pdf", true) == true -> "PDF"
             name?.endsWith(".epub", true) == true -> "EPUB"
-            else -> "MARKDOWN"
+            else -> "TEXT"
         }
     }
 }

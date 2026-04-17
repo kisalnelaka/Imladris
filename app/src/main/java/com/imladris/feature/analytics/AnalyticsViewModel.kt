@@ -14,10 +14,9 @@ class AnalyticsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val artifactCount: Flow<Int> = libraryDao.getArtifactCount()
-    val highlightCount: Flow<Int> = libraryDao.getHighlightCount()
-    val recentArtifacts: Flow<List<ArtifactEntity>> = libraryDao.getRecentArtifacts()
+    val recentArtifacts: Flow<List<ArtifactEntity>> = libraryDao.getRecentlyOpened()
     
-    val focusScore: Flow<Int> = libraryDao.getRecentArtifacts().map { list ->
+    val focusScore: Flow<Int> = libraryDao.getRecentlyOpened().map { list ->
         if (list.isEmpty()) 0 else (list.sumOf { it.progress.toDouble() * 100 } / list.size).toInt()
     }
 }

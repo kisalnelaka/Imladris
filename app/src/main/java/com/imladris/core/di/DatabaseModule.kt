@@ -22,7 +22,9 @@ object DatabaseModule {
             context,
             ImladrisDatabase::class.java,
             "imladris_db"
-        ).build()
+        )
+        .fallbackToDestructiveMigration() // Prevent crash on schema change
+        .build()
     }
 
     @Provides

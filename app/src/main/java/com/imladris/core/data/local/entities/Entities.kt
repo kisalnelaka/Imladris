@@ -20,7 +20,8 @@ data class FolderEntity(
             childColumns = ["parentFolderId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index(value = ["parentFolderId"])]
 )
 data class ArtifactEntity(
     @PrimaryKey val id: String,
@@ -29,7 +30,7 @@ data class ArtifactEntity(
     val type: String,
     val coverPath: String?,
     val lastRead: Long,
-    val addedDate: Long, // New field for "Recently Added"
+    val addedDate: Long,
     val progress: Float,
     val parentFolderId: String?
 )

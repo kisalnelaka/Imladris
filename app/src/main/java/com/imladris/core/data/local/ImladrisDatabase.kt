@@ -23,6 +23,10 @@ interface LibraryDao {
 
     @Query("SELECT * FROM artifacts ORDER BY lastRead DESC LIMIT 10")
     fun getRecentlyOpened(): Flow<List<ArtifactEntity>>
+    
+    // Alias for compatibility with other modules
+    @Query("SELECT * FROM artifacts ORDER BY lastRead DESC LIMIT 10")
+    fun getRecentArtifacts(): Flow<List<ArtifactEntity>>
 
     @Query("SELECT * FROM artifacts ORDER BY addedDate DESC LIMIT 10")
     fun getRecentlyAdded(): Flow<List<ArtifactEntity>>
@@ -30,8 +34,17 @@ interface LibraryDao {
     @Query("SELECT COUNT(*) FROM artifacts")
     fun getArtifactCount(): Flow<Int>
 
+    @Query("SELECT COUNT(*) FROM highlights")
+    fun getHighlightCount(): Flow<Int>
+
+    @Query("SELECT * FROM highlights WHERE artifactId = :artifactId")
+    fun getHighlights(artifactId: String): Flow<List<HighlightEntity>>
+    
     @Query("SELECT * FROM artifacts")
     fun getAllArtifacts(): Flow<List<ArtifactEntity>>
+
+    @Query("SELECT * FROM artifacts WHERE id = :id")
+    suspend fun getArtifactById(id: String): ArtifactEntity?
 
     @Query("DELETE FROM artifacts")
     suspend fun deleteAllArtifacts()

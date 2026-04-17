@@ -31,6 +31,7 @@ class LibraryRepository @Inject constructor(
     fun getArtifactsIn(folderId: String): Flow<List<ArtifactEntity>> = libraryDao.getArtifactsIn(folderId)
     fun getRecentlyOpened(): Flow<List<ArtifactEntity>> = libraryDao.getRecentlyOpened()
     fun getRecentlyAdded(): Flow<List<ArtifactEntity>> = libraryDao.getRecentlyAdded()
+    fun getRecentArtifacts(): Flow<List<ArtifactEntity>> = libraryDao.getRecentArtifacts()
 
     suspend fun scanDirectory(uri: Uri) = withContext(Dispatchers.IO) {
         try {
@@ -75,7 +76,7 @@ class LibraryRepository @Inject constructor(
                     path = document.uri.toString(),
                     type = name.substringAfterLast("."),
                     coverPath = coverPath,
-                    lastRead = 0L, // Not read yet
+                    lastRead = 0L,
                     addedDate = System.currentTimeMillis(),
                     progress = 0f,
                     parentFolderId = parentId

@@ -27,7 +27,7 @@ class ImladrisWidget : GlanceAppWidget() {
             WidgetEntryPoint::class.java
         ).libraryRepository()
 
-        val recentArtifact = repository.getRecentArtifacts().first().firstOrNull()
+        val recentArtifact = repository.getRecentlyOpened().first().firstOrNull()
         val currentBook = recentArtifact?.title ?: "No active journeys"
         val progress = recentArtifact?.progress ?: 0.0f
 

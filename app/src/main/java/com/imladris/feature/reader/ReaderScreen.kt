@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.imladris.R
+import com.imladris.core.ui.components.EtherealBackgroundGlow
+import com.imladris.core.ui.components.ReadingVignette
 import com.imladris.core.ui.components.ZoomableBox
 import com.imladris.core.ui.theme.*
 
@@ -213,51 +216,6 @@ fun ErrorContent(message: String) {
             textAlign = TextAlign.Center
         )
     }
-}
-
-@Composable
-fun EtherealBackgroundGlow() {
-    val infiniteTransition = rememberInfiniteTransition(label = "glow")
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.05f,
-        targetValue = 0.15f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(4000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "alpha"
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .graphicsLayer { this.alpha = alpha }
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(CelestialBlue, Color.Transparent),
-                    center = Offset(200f, 200f),
-                    radius = 800f
-                )
-            )
-    )
-}
-
-@Composable
-fun ReadingVignette(isFocusMode: Boolean) {
-    val alpha by animateFloatAsState(if (isFocusMode) 0.9f else 0.4f, animationSpec = tween(1000), label = "vignette")
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .graphicsLayer { this.alpha = alpha }
-            .background(
-                Brush.verticalGradient(
-                    0f to MidnightBlue,
-                    0.15f to Color.Transparent,
-                    0.85f to Color.Transparent,
-                    1f to MidnightBlue
-                )
-            )
-    )
 }
 
 @Composable

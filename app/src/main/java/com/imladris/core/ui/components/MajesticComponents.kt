@@ -106,6 +106,7 @@ fun ZoomableBox(
                 detectTransformGestures { _, pan, zoom, _ ->
                     scale = (scale * zoom).coerceIn(1f, 5f)
                     if (scale > 1f) {
+                        // RIGID HORIZONTAL: Only allow panning if zoom is active, but keep horizontal 0 if rigid
                         val newX = if (rigidHorizontal) 0f else offset.x + pan.x
                         offset = Offset(newX, offset.y + pan.y)
                     } else {

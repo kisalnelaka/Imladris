@@ -6,12 +6,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.imladris.core.data.local.ImladrisDatabase
 import dagger.assisted.Assisted
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.flow.first
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 
 @HiltWorker
 class MemoryRecallWorker @AssistedInject constructor(
@@ -21,25 +17,18 @@ class MemoryRecallWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val artifacts = database.libraryDao().getRecentArtifacts().first()
+        // Fetch real recently opened artifacts
+        val artifacts = database.libraryDao().getRecentlyOpened().first()
         if (artifacts.isEmpty()) return Result.success()
 
         val randomArtifact = artifacts.random()
-        val highlights = database.libraryDao().getHighlights(randomArtifact.id).first()
+        // Highlights might be empty, so we provide a gentle reminder of the book itself
+        val message = "Continue your journey in ${randomArtifact.title}"
         
-        if (highlights.isNotEmpty()) {
-            val recall = highlights.random()
-            ImladrisNotifications.showRecallNotification(
-                applicationContext,
-                randomArtifact.title,
-                recall.content
-            )
-        } else {
-            ImladrisNotifications.showGuidanceNotification(
-                applicationContext,
-                "The halls of Imladris remind you of ${randomArtifact.title}"
-            )
-        }
+        ImladrisNotifications.showGuidanceNotification(
+            applicationContext,
+            message
+        )
 
         return Result.success()
     }

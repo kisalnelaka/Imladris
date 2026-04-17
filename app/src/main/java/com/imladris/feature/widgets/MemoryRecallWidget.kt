@@ -26,15 +26,13 @@ class MemoryRecallWidget : GlanceAppWidget() {
             WidgetEntryPoint::class.java
         ).libraryRepository()
 
-        // Fetch a real random highlight if possible
-        val artifacts = database.getRecentArtifacts().first()
+        // Fetch a real random artifact
+        val artifacts = database.getRecentlyOpened().first()
         var quote = "The sanctuary awaits your first reflection."
         var source = "Imladris"
 
         if (artifacts.isNotEmpty()) {
             val artifact = artifacts.random()
-            // Note: In a full implementation, we'd fetch actual highlights here
-            // For now, we use the book title as the 'source' if highlights are empty
             quote = "Continuing your journey in this artifact..."
             source = artifact.title
         }
