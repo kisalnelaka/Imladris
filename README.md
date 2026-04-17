@@ -82,7 +82,7 @@ com.imladris
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/imladris.git
+git clone https://github.com/<username>/imladris.git
 
 # Open in Android Studio, let Gradle sync, then:
 ./gradlew assembleDebug

@@ -1,9 +1,12 @@
 package com.imladris.core.data.repository
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
+import android.os.ParcelFileDescriptor
+import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import com.imladris.core.data.local.LibraryDao
 import com.imladris.core.data.local.entities.ArtifactEntity
@@ -24,41 +27,43 @@ class LibraryRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     fun getRootFolders(): Flow<List<FolderEntity>> = libraryDao.getRootFolders()
-    
     fun getFoldersIn(parentId: String): Flow<List<FolderEntity>> = libraryDao.getFoldersIn(parentId)
-    
     fun getArtifactsIn(folderId: String): Flow<List<ArtifactEntity>> = libraryDao.getArtifactsIn(folderId)
-
-    fun getRecentArtifacts(): Flow<List<ArtifactEntity>> = libraryDao.getRecentArtifacts()
+    fun getRecentlyOpened(): Flow<List<ArtifactEntity>> = libraryDao.getRecentlyOpened()
+    fun getRecentlyAdded(): Flow<List<ArtifactEntity>> = libraryDao.getRecentlyAdded()
 
     suspend fun scanDirectory(uri: Uri) = withContext(Dispatchers.IO) {
+        try {
+            context.contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        } catch (e: Exception) {}
+
         val rootDoc = DocumentFile.fromTreeUri(context, uri) ?: return@withContext
         scanRecursive(rootDoc, null)
     }
 
     private suspend fun scanRecursive(document: DocumentFile, parentId: String?) {
-        // Strict distinction between directories and files
-        if (document.isDirectory) {
+        val isDirectory = document.isDirectory || 
+                         document.type == DocumentsContract.Document.MIME_TYPE_DIR ||
+                         document.type == "vnd.android.document/directory"
+
+        if (isDirectory) {
             val folderId = UUID.randomUUID().toString()
             val folder = FolderEntity(
                 id = folderId,
-                name = document.name ?: "Unknown Sanctuary",
+                name = document.name ?: "Sanctuary",
                 path = document.uri.toString(),
                 parentId = parentId,
-                glowColor = 0xFF64FFDA.toInt()
+                glowColor = 0xFF79C0FF.toInt()
             )
             libraryDao.insertFolder(folder)
-            
-            document.listFiles().forEach { child ->
-                scanRecursive(child, folderId)
-            }
+            document.listFiles().forEach { child -> scanRecursive(child, folderId) }
         } else if (document.isFile) {
             val name = document.name ?: return
             val lowerName = name.lowercase()
-            
-            // Only index valid document files, excluding directories that might have extensions
             if (lowerName.endsWith(".txt") || lowerName.endsWith(".pdf") || lowerName.endsWith(".epub")) {
-                
                 var coverPath: String? = null
                 if (lowerName.endsWith(".pdf")) {
                     coverPath = extractPdfCover(document.uri, name)
@@ -70,7 +75,8 @@ class LibraryRepository @Inject constructor(
                     path = document.uri.toString(),
                     type = name.substringAfterLast("."),
                     coverPath = coverPath,
-                    lastRead = System.currentTimeMillis(),
+                    lastRead = 0L, // Not read yet
+                    addedDate = System.currentTimeMillis(),
                     progress = 0f,
                     parentFolderId = parentId
                 )
@@ -87,14 +93,11 @@ class LibraryRepository @Inject constructor(
                     val page = renderer.openPage(0)
                     val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
                     page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                    
-                    val cacheFile = File(context.cacheDir, "covers/${fileName}.jpg")
+                    val cacheFile = File(context.cacheDir, "covers/${fileName.hashCode()}.jpg")
                     cacheFile.parentFile?.mkdirs()
-                    
                     FileOutputStream(cacheFile).use { out ->
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
                     }
-                    
                     page.close()
                     renderer.close()
                     cacheFile.absolutePath
@@ -103,8 +106,10 @@ class LibraryRepository @Inject constructor(
                     null
                 }
             }
-        } catch (e: Exception) {
-            null
-        }
+        } catch (e: Exception) { null }
+    }
+
+    suspend fun updateLastRead(artifact: ArtifactEntity) = withContext(Dispatchers.IO) {
+        libraryDao.insertArtifact(artifact.copy(lastRead = System.currentTimeMillis()))
     }
 }

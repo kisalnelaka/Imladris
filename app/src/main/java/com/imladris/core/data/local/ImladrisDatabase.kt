@@ -22,24 +22,28 @@ interface LibraryDao {
     suspend fun insertArtifact(artifact: ArtifactEntity)
 
     @Query("SELECT * FROM artifacts ORDER BY lastRead DESC LIMIT 10")
-    fun getRecentArtifacts(): Flow<List<ArtifactEntity>>
+    fun getRecentlyOpened(): Flow<List<ArtifactEntity>>
+
+    @Query("SELECT * FROM artifacts ORDER BY addedDate DESC LIMIT 10")
+    fun getRecentlyAdded(): Flow<List<ArtifactEntity>>
 
     @Query("SELECT COUNT(*) FROM artifacts")
     fun getArtifactCount(): Flow<Int>
 
-    @Query("SELECT COUNT(*) FROM highlights")
-    fun getHighlightCount(): Flow<Int>
-
-    @Query("SELECT * FROM highlights WHERE artifactId = :artifactId")
-    fun getHighlights(artifactId: String): Flow<List<HighlightEntity>>
-    
     @Query("SELECT * FROM artifacts")
     fun getAllArtifacts(): Flow<List<ArtifactEntity>>
+
+    @Query("DELETE FROM artifacts")
+    suspend fun deleteAllArtifacts()
+
+    @Query("DELETE FROM folders")
+    suspend fun deleteAllFolders()
 }
 
 @Database(
     entities = [FolderEntity::class, ArtifactEntity::class, HighlightEntity::class],
-    version = 1
+    version = 2,
+    exportSchema = false
 )
 abstract class ImladrisDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao

@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Imladris</string>
-    <string name="hall_title">Sanctuary</string>
-    <string name="hall_subtitle">Where your journey through knowledge begins</string>
-    <string name="section_recent_title">Continue Reading</string>
-    <string name="section_overview_title">Library Overview</string>
-    <string name="action_import">Import Files</string>
-    <string name="action_stats">Statistics</string>
-    <string name="library_title">Library</string>
-    <string name="library_subtitle">Traverse the corridors of wisdom</string>
+    <string name="hall_title">Sanctuary Hall</string>
+    <string name="hall_subtitle">Welcome back to your mind palace</string>
+    <string name="section_recent_title">Active Scrolls</string>
+    <string name="section_overview_title">The Great Library</string>
+    <string name="action_import">Expand Sanctuary</string>
+    <string name="action_stats">Chronicle of Mastery</string>
+    <string name="library_title">Knowledge Corridors</string>
+    <string name="library_subtitle">Traverse the depths of your collection</string>
     <string name="reader_focus_mode">Deep Focus</string>
     <string name="reader_exit_focus">Awaken</string>
-    <string name="add_sanctuary">Add Sanctuary</string>
-    <string name="empty_hall_title">Awaiting Enlightenment</string>
-    <string name="empty_hall_desc">Select a scroll-directory to fill these halls with wisdom.</string>
-    <string name="no_artifacts_found">No artifacts found in this sanctuary.</string>
+    <string name="add_sanctuary">Awaken New Scrolls</string>
+    <string name="empty_hall_title">The Halls are Silent</string>
+    <string name="empty_hall_desc">Tap the elven star to breathe life into your sanctuary.</string>
+    <string name="no_artifacts_found">No scrolls found in this corridor.</string>
+
+    <!-- Guided Tour -->
+    <string name="tour_welcome_title">Welcome, Wanderer</string>
+    <string name="tour_welcome_desc">You have entered Imladris, a sanctuary for your digital scrolls. Let us guide you through its halls.</string>
+    <string name="tour_import_title">Expand the Sanctuary</string>
+    <string name="tour_import_desc">Use the elven star below to choose a folder on your device. Every tome within will be rendered in your collection.</string>
+    <string name="tour_library_title">The Corridors</string>
+    <string name="tour_library_desc">Browse your entire collection with covers rendered by elven craft. Toggle between gallery and list views.</string>
+    <string name="tour_focus_title">Deep Focus</string>
+    <string name="tour_focus_desc">When reading, enter Deep Focus to fade away the world and commune solely with the words.</string>
+    <string name="tour_finish">Enter the Sanctuary</string>
 </resources>

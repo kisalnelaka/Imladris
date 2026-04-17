@@ -29,6 +29,7 @@ data class ArtifactEntity(
     val type: String,
     val coverPath: String?,
     val lastRead: Long,
+    val addedDate: Long, // New field for "Recently Added"
     val progress: Float,
     val parentFolderId: String?
 )

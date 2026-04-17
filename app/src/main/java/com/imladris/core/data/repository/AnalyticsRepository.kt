@@ -1,8 +1,8 @@
 package com.imladris.core.data.repository
 
 import com.imladris.core.data.local.LibraryDao
-import com.imladris.core.data.local.entities.HighlightEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -10,21 +10,25 @@ import javax.inject.Singleton
 class AnalyticsRepository @Inject constructor(
     private val libraryDao: LibraryDao
 ) {
-    // In a real app, reading sessions would be stored in a separate table
-    // For now, we derive analytics from highlights and artifact progress
-    
+    /**
+     * Derives a focus score (0–100) from reading progress across all artifacts.
+     * A score of 100 means all indexed artifacts have been fully read.
+     */
     fun getFocusScore(): Flow<Float> {
-        // Pseudo-logic: calculate focus based on highlights density and progress
-        return kotlinx.coroutines.flow.flowOf(85.5f)
+        return libraryDao.getRecentArtifacts().map { artifacts ->
+            if (artifacts.isEmpty()) return@map 0f
+            val average = artifacts.sumOf { it.progress.toDouble() } / artifacts.size
+            (average * 100).toFloat().coerceIn(0f, 100f)
+        }
     }
 
+    /**
+     * Returns a category breakdown of reading time derived from folder names.
+     * Full implementation requires a ReadingSession table.
+     */
     fun getReadingStats(): Flow<Map<String, Int>> {
-        return kotlinx.coroutines.flow.flowOf(
-            mapOf(
-                "History" to 12, // Hours
-                "Philosophy" to 5,
-                "Science" to 3
-            )
-        )
+        return libraryDao.getRootFolders().map { folders ->
+            folders.associate { it.name to 0 }
+        }
     }
 }

@@ -12,6 +12,7 @@ class HallViewModel @Inject constructor(
     private val repository: LibraryRepository
 ) : ViewModel() {
 
-    val recentArtifacts: Flow<List<ArtifactEntity>> = repository.getRecentArtifacts()
+    val recentlyOpened: Flow<List<ArtifactEntity>> = repository.getRecentlyOpened()
+    val recentlyAdded: Flow<List<ArtifactEntity>> = repository.getRecentlyAdded()
 
 }

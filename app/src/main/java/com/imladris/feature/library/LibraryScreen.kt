@@ -14,9 +14,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,7 +32,7 @@ import com.imladris.core.ui.theme.*
 import kotlinx.coroutines.flow.flowOf
 
 enum class LibraryViewMode {
-    LIST, GRID, COVERS
+    LIST, COVERS
 }
 
 @Composable
@@ -39,7 +41,7 @@ fun LibraryScreen(
     viewModel: LibraryViewModel = hiltViewModel()
 ) {
     val currentFolderId by viewModel.currentFolderId.collectAsState()
-    var viewMode by remember { mutableStateOf(LibraryViewMode.LIST) }
+    var viewMode by remember { mutableStateOf(LibraryViewMode.COVERS) }
     
     val folders by remember(currentFolderId) {
         if (currentFolderId == null) viewModel.rootFolders 
@@ -81,13 +83,18 @@ fun LibraryScreen(
             // View Mode Selector
             Row {
                 IconButton(onClick = { viewMode = LibraryViewMode.LIST }) {
-                    Icon(Icons.Default.List, null, tint = if (viewMode == LibraryViewMode.LIST) CelestialBlue else SilverGlow.copy(alpha = 0.4f))
-                }
-                IconButton(onClick = { viewMode = LibraryViewMode.GRID }) {
-                    Icon(Icons.Default.GridView, null, tint = if (viewMode == LibraryViewMode.GRID) CelestialBlue else SilverGlow.copy(alpha = 0.4f))
+                    Icon(
+                        imageVector = Icons.Default.List, 
+                        contentDescription = "List View",
+                        tint = if (viewMode == LibraryViewMode.LIST) CelestialBlue else SilverGlow.copy(alpha = 0.4f)
+                    )
                 }
                 IconButton(onClick = { viewMode = LibraryViewMode.COVERS }) {
-                    Icon(Icons.Default.AutoStories, null, tint = if (viewMode == LibraryViewMode.COVERS) CelestialBlue else SilverGlow.copy(alpha = 0.4f))
+                    Icon(
+                        imageVector = Icons.Default.GridView, 
+                        contentDescription = "Cover View",
+                        tint = if (viewMode == LibraryViewMode.COVERS) CelestialBlue else SilverGlow.copy(alpha = 0.4f)
+                    )
                 }
             }
         }
@@ -108,7 +115,6 @@ fun LibraryScreen(
         } else {
             when (viewMode) {
                 LibraryViewMode.LIST -> LibraryListView(folders, artifacts, onArtifactClick, viewModel)
-                LibraryViewMode.GRID -> LibraryGridView(folders, artifacts, onArtifactClick, viewModel)
                 LibraryViewMode.COVERS -> LibraryCoverView(folders, artifacts, onArtifactClick, viewModel)
             }
         }
@@ -128,33 +134,10 @@ fun LibraryListView(
         contentPadding = PaddingValues(bottom = 32.dp)
     ) {
         items(folders) { folder ->
-            LibraryFolderItem(folder) { viewModel.navigateToFolder(folder.id) }
+            LibraryFolderListItem(folder) { viewModel.navigateToFolder(folder.id) }
         }
         items(artifacts) { artifact ->
             LibraryArtifactListItem(artifact) { onArtifactClick(artifact.title, artifact.path) }
-        }
-    }
-}
-
-@Composable
-fun LibraryGridView(
-    folders: List<FolderEntity>,
-    artifacts: List<ArtifactEntity>,
-    onArtifactClick: (String, String) -> Unit,
-    viewModel: LibraryViewModel
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 32.dp)
-    ) {
-        items(folders) { folder ->
-            LibraryFolderItem(folder) { viewModel.navigateToFolder(folder.id) }
-        }
-        items(artifacts) { artifact ->
-            LibraryArtifactGridItem(artifact) { onArtifactClick(artifact.title, artifact.path) }
         }
     }
 }
@@ -174,7 +157,7 @@ fun LibraryCoverView(
         contentPadding = PaddingValues(bottom = 32.dp)
     ) {
         items(folders) { folder ->
-            LibraryFolderItem(folder) { viewModel.navigateToFolder(folder.id) }
+            LibraryFolderCoverItem(folder) { viewModel.navigateToFolder(folder.id) }
         }
         items(artifacts) { artifact ->
             LibraryArtifactCoverItem(artifact) { onArtifactClick(artifact.title, artifact.path) }
@@ -183,7 +166,7 @@ fun LibraryCoverView(
 }
 
 @Composable
-fun LibraryFolderItem(folder: FolderEntity, onClick: () -> Unit) {
+fun LibraryFolderListItem(folder: FolderEntity, onClick: () -> Unit) {
     GlassCard(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
     ) {
@@ -199,6 +182,37 @@ fun LibraryFolderItem(folder: FolderEntity, onClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = folder.name, style = MaterialTheme.typography.bodyLarge, color = SilverGlow)
+        }
+    }
+}
+
+@Composable
+fun LibraryFolderCoverItem(folder: FolderEntity, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.aspectRatio(0.7f).clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = DeepMist.copy(alpha = 0.5f)),
+        shape = MaterialTheme.shapes.small,
+        border = androidx.compose.foundation.BorderStroke(1.dp, CelestialBlue.copy(alpha = 0.2f))
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.Folder,
+                    contentDescription = null,
+                    tint = EtherealTeal.copy(alpha = 0.8f),
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = folder.name,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = SilverGlow,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+            }
         }
     }
 }
@@ -221,35 +235,15 @@ fun LibraryArtifactListItem(artifact: ArtifactEntity, onClick: () -> Unit) {
                         contentScale = ContentScale.Crop
                     )
                 } else {
-                    Icon(Icons.Default.Description, null, tint = SilverGlow.copy(alpha = 0.4f), modifier = Modifier.fillMaxSize())
+                    Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.05f)), contentAlignment = Alignment.Center) {
+                         Text(text = artifact.title.take(1), color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(text = artifact.title, style = MaterialTheme.typography.bodyLarge, color = SilverGlow, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(text = artifact.type.uppercase(), style = MaterialTheme.typography.labelSmall, color = SilverGlow.copy(alpha = 0.4f))
-            }
-        }
-    }
-}
-
-@Composable
-fun LibraryArtifactGridItem(artifact: ArtifactEntity, onClick: () -> Unit) {
-    GlassCard(
-        modifier = Modifier.height(200.dp).clickable(onClick = onClick)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            if (artifact.coverPath != null) {
-                AsyncImage(
-                    model = artifact.coverPath,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    alpha = 0.6f
-                )
-            }
-            Column(modifier = Modifier.align(Alignment.BottomStart).padding(12.dp)) {
-                Text(text = artifact.title, style = MaterialTheme.typography.bodyMedium, color = SilverGlow, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
     }
@@ -271,8 +265,17 @@ fun LibraryArtifactCoverItem(artifact: ArtifactEntity, onClick: () -> Unit) {
                     contentScale = ContentScale.Crop
                 )
             } else {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = artifact.title.take(1), color = SilverGlow.copy(alpha = 0.2f), fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                Box(modifier = Modifier.fillMaxSize().background(Color.White.copy(alpha = 0.05f)), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = artifact.title, 
+                        color = Color.White, 
+                        fontSize = 12.sp, 
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(8.dp),
+                        maxLines = 5,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
         }

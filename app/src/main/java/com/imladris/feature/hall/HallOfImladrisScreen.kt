@@ -10,21 +10,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoStories
-import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.imladris.R
 import com.imladris.core.data.local.entities.ArtifactEntity
 import com.imladris.core.ui.components.ElvenDivider
 import com.imladris.core.ui.components.GlassCard
@@ -35,10 +32,12 @@ import com.imladris.feature.library.LibraryViewModel
 @Composable
 fun HallOfImladrisScreen(
     onArtifactClick: (String, String) -> Unit,
+    onSettingsClick: () -> Unit,
     hallViewModel: HallViewModel = hiltViewModel(),
     libraryViewModel: LibraryViewModel = hiltViewModel()
 ) {
-    val recentArtifacts by hallViewModel.recentArtifacts.collectAsState(initial = emptyList())
+    val recentlyOpened by hallViewModel.recentlyOpened.collectAsState(initial = emptyList())
+    val recentlyAdded by hallViewModel.recentlyAdded.collectAsState(initial = emptyList())
     
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -54,67 +53,45 @@ fun HallOfImladrisScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 24.dp)
             ) {
-                Spacer(modifier = Modifier.height(64.dp))
-                
-                Text(
-                    text = "SANCTUARY",
-                    style = MaterialTheme.typography.displayLarge.copy(
-                        fontWeight = FontWeight.Light,
-                        letterSpacing = 4.sp,
-                        fontSize = 44.sp
-                    ),
-                    color = SilverGlow
-                )
-                
-                Text(
-                    text = "A mind palace for your digital scrolls",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = CelestialBlue.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-                
-                Spacer(modifier = Modifier.height(32.dp))
-                ElvenDivider()
                 Spacer(modifier = Modifier.height(48.dp))
                 
-                if (recentArtifacts.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = "JOURNEYS IN PROGRESS",
-                        style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 2.sp),
-                        color = Champagne
+                        text = "My Library",
+                        style = MaterialTheme.typography.displayLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 1.sp,
+                            fontSize = 36.sp
+                        ),
+                        color = SilverGlow
                     )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    RecentArtifactsRow(recentArtifacts, onArtifactClick)
-                    Spacer(modifier = Modifier.height(48.dp))
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings", tint = SilverGlow)
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                if (recentlyOpened.isNotEmpty()) {
+                    LibrarySectionHeader("Continue Reading")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ArtifactRow(recentlyOpened, onArtifactClick)
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
 
-                Text(
-                    text = "CORRIDORS",
-                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 2.sp),
-                    color = Champagne
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                
-                if (recentArtifacts.isEmpty()) {
+                if (recentlyAdded.isNotEmpty()) {
+                    LibrarySectionHeader("Recently Added")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ArtifactRow(recentlyAdded, onArtifactClick)
+                }
+
+                if (recentlyOpened.isEmpty() && recentlyAdded.isEmpty()) {
+                    Spacer(modifier = Modifier.height(100.dp))
                     EmptyLibraryPrompt { launcher.launch(null) }
-                } else {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        ActionCard(
-                            modifier = Modifier.weight(1f),
-                            icon = Icons.Default.FolderOpen,
-                            title = "Import Files",
-                            onClick = { launcher.launch(null) }
-                        )
-                        ActionCard(
-                            modifier = Modifier.weight(1f),
-                            icon = Icons.Default.AutoStories,
-                            title = "Insights",
-                            onClick = { /* Navigate to analytics */ }
-                        )
-                    }
                 }
                 
                 Spacer(modifier = Modifier.height(120.dp))
@@ -129,87 +106,37 @@ fun HallOfImladrisScreen(
                     .padding(24.dp),
                 shape = MaterialTheme.shapes.extraLarge
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Sanctuary", modifier = Modifier.size(28.dp))
+                Icon(Icons.Default.Add, contentDescription = "Import Folder", modifier = Modifier.size(28.dp))
             }
         }
     }
 }
 
 @Composable
-fun ActionCard(
-    modifier: Modifier = Modifier,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    onClick: () -> Unit
-) {
-    GlassCard(
-        modifier = modifier.clickable(onClick = onClick)
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp).fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(icon, contentDescription = null, tint = CelestialBlue, modifier = Modifier.size(32.dp))
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = title, 
-                color = SilverGlow, 
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    }
+fun LibrarySectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium.copy(
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.5.sp
+        ),
+        color = Champagne
+    )
 }
 
 @Composable
-fun EmptyLibraryPrompt(onAddClick: () -> Unit) {
-    GlassCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onAddClick)
-    ) {
-        Column(
-            modifier = Modifier.padding(40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                Icons.Default.FolderOpen,
-                contentDescription = null,
-                tint = CelestialBlue,
-                modifier = Modifier.size(64.dp)
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = "Awaiting Enlightenment",
-                style = MaterialTheme.typography.headlineSmall,
-                color = SilverGlow,
-                fontWeight = FontWeight.Light
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "Select a scroll-directory to fill these halls with wisdom.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = SilverGlow.copy(alpha = 0.5f),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-        }
-    }
-}
-
-@Composable
-fun RecentArtifactsRow(
+fun ArtifactRow(
     artifacts: List<ArtifactEntity>,
     onArtifactClick: (String, String) -> Unit
 ) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
-        contentPadding = PaddingValues(horizontal = 4.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(artifacts) { artifact ->
             GlassCard(
                 modifier = Modifier
-                    .width(200.dp)
-                    .height(280.dp)
+                    .width(160.dp)
+                    .height(230.dp)
                     .clickable { onArtifactClick(artifact.title, artifact.path) }
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -219,41 +146,64 @@ fun RecentArtifactsRow(
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
-                            alpha = 0.5f
+                            alpha = 0.6f
                         )
+                    } else {
+                        // Majestic text placeholder
+                        Box(modifier = Modifier.fillMaxSize().padding(12.dp), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = artifact.title,
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                maxLines = 4
+                            )
+                        }
                     }
                     
-                    Column(modifier = Modifier.align(Alignment.TopStart).padding(20.dp)) {
+                    Column(
+                        modifier = Modifier.align(Alignment.BottomStart).padding(12.dp)
+                    ) {
                         Text(
                             text = artifact.title,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.labelMedium,
                             color = SilverGlow,
-                            maxLines = 4,
-                            lineHeight = 24.sp,
-                            fontWeight = FontWeight.Normal
+                            maxLines = 1,
+                            fontWeight = FontWeight.Medium
                         )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = artifact.type.uppercase(),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = CelestialBlue.copy(alpha = 0.8f)
-                        )
-                    }
-                    
-                    if (artifact.progress >= 0f) {
-                        Column(modifier = Modifier.align(Alignment.BottomCenter).padding(horizontal = 20.dp, vertical = 16.dp)) {
+                        if (artifact.progress > 0f) {
                             LinearProgressIndicator(
                                 progress = artifact.progress,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(2.dp),
+                                modifier = Modifier.fillMaxWidth().height(2.dp).padding(top = 4.dp),
                                 color = CelestialBlue,
-                                trackColor = SilverGlow.copy(alpha = 0.05f)
+                                trackColor = SilverGlow.copy(alpha = 0.1f)
                             )
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EmptyLibraryPrompt(onAddClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Your library is empty.",
+            style = MaterialTheme.typography.headlineSmall,
+            color = SilverGlow.copy(alpha = 0.5f),
+            fontWeight = FontWeight.Light
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = onAddClick,
+            colors = ButtonDefaults.buttonColors(containerColor = CelestialBlue.copy(alpha = 0.2f))
+        ) {
+            Text("Import Books", color = CelestialBlue)
         }
     }
 }
