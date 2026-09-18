@@ -48,6 +48,10 @@ class LibraryRepository @Inject constructor(
         libraryDao.getArtifactById(id)
     }
 
+    suspend fun getArtifactByPath(path: String): ArtifactEntity? = withContext(Dispatchers.IO) {
+        libraryDao.getArtifactByPath(path)
+    }
+
     suspend fun updateReadingProgress(
         id: String,
         lastPage: Int,

@@ -6,6 +6,7 @@ import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
+import android.util.LruCache
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.imladris.core.data.local.entities.ArtifactEntity
@@ -21,10 +22,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
 import java.util.Calendar
+import java.util.zip.ZipInputStream
 import javax.inject.Inject
 
 sealed class ReaderContent {
@@ -72,6 +72,7 @@ class ReaderViewModel @Inject constructor(
 
     private var pdfRenderer: PdfRenderer? = null
     private var pfd: ParcelFileDescriptor? = null
+    private val bitmapCache = LruCache<Int, Bitmap>(32)
 
     fun loadContent(uriString: String?, widthDp: Float = 360f, heightDp: Float = 640f, fontSizeSp: Float = 18f) {
         if (uriString == null) {
@@ -87,18 +88,10 @@ class ReaderViewModel @Inject constructor(
             try {
                 val uri = Uri.parse(uriString)
 
-                // Match with database artifact
-                val all = withContext(Dispatchers.IO) {
-                    // Try finding matching artifact by path
-                    var matched: ArtifactEntity? = null
-                    repository.getAllArtifacts().collect { list ->
-                        matched = list.find { it.path == uriString }
-                        if (matched != null) return@collect
-                    }
-                    matched
-                }
-                activeArtifact = all
-                all?.let {
+                // Match with database artifact directly (non-blocking single query)
+                val matched = repository.getArtifactByPath(uriString)
+                activeArtifact = matched
+                matched?.let {
                     _readingSpeedWpm.value = if (it.readingSpeedWpm > 50f) it.readingSpeedWpm else 220f
                     _currentPage.value = it.lastPage
                 }
@@ -112,8 +105,14 @@ class ReaderViewModel @Inject constructor(
                     return@launch
                 }
 
-                if (mimeType == "application/pdf" || uriString.lowercase().contains(".pdf")) {
+                val lower = uriString.lowercase()
+                val isPdf = mimeType == "application/pdf" || lower.endsWith(".pdf") || matched?.type?.lowercase() == "pdf"
+                val isEpub = mimeType == "application/epub+zip" || lower.endsWith(".epub") || matched?.type?.lowercase() == "epub"
+
+                if (isPdf) {
                     loadPdf(uri)
+                } else if (isEpub) {
+                    loadEpub(uri, widthDp, heightDp, fontSizeSp)
                 } else {
                     loadText(uri, widthDp, heightDp, fontSizeSp)
                 }
@@ -151,25 +150,66 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
+    private suspend fun loadEpub(uri: Uri, widthDp: Float, heightDp: Float, fontSizeSp: Float) = withContext(Dispatchers.IO) {
+        try {
+            val textBuilder = StringBuilder()
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                ZipInputStream(stream).use { zip ->
+                    var entry = zip.nextEntry
+                    while (entry != null) {
+                        val name = entry.name.lowercase()
+                        if (name.endsWith(".html") || name.endsWith(".xhtml") || name.endsWith(".htm")) {
+                            val content = zip.bufferedReader().readText()
+                            val stripped = content
+                                .replace(Regex("<style[^>]*>[\\s\\S]*?</style>", RegexOption.IGNORE_CASE), "")
+                                .replace(Regex("<script[^>]*>[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), "")
+                                .replace(Regex("<[^>]+>"), " ")
+                                .replace("&nbsp;", " ")
+                                .replace("&amp;", "&")
+                                .replace("&lt;", "<")
+                                .replace("&gt;", ">")
+                                .replace("&quot;", "\"")
+                                .replace("&#39;", "'")
+                                .replace(Regex("\\s+"), " ")
+                                .trim()
+
+                            if (stripped.isNotEmpty()) {
+                                textBuilder.append(stripped).append("\n\n")
+                            }
+                        }
+                        zip.closeEntry()
+                        entry = zip.nextEntry
+                    }
+                }
+            }
+
+            val fullText = textBuilder.toString()
+            if (fullText.isNotBlank()) {
+                val pages = ReadingPacingEngine.paginateText(fullText, widthDp, heightDp, fontSizeSp)
+                val words = fullText.split("\\s+".toRegex()).count { it.isNotBlank() }
+                _totalPages.value = pages.size
+                _contentState.value = ReaderContent.Text(pages, words)
+            } else {
+                loadText(uri, widthDp, heightDp, fontSizeSp)
+            }
+        } catch (e: Exception) {
+            loadText(uri, widthDp, heightDp, fontSizeSp)
+        }
+    }
+
     private suspend fun loadText(uri: Uri, widthDp: Float, heightDp: Float, fontSizeSp: Float) = withContext(Dispatchers.IO) {
         try {
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                    val sb = java.lang.StringBuilder()
-                    var line: String? = reader.readLine()
-                    while (line != null) {
-                        sb.append(line).append("\n")
-                        line = reader.readLine()
-                    }
-                    val fullText = sb.toString()
-                    val pages = ReadingPacingEngine.paginateText(fullText, widthDp, heightDp, fontSizeSp)
-                    val words = fullText.split("\\s+".toRegex()).count { it.isNotBlank() }
+            val fullText = context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                inputStream.bufferedReader().readText()
+            }
 
-                    _totalPages.value = pages.size
-                    _contentState.value = ReaderContent.Text(pages, words)
-                }
-            } ?: run {
-                _contentState.value = ReaderContent.Error("Unable to reach the artifact.")
+            if (!fullText.isNullOrBlank()) {
+                val pages = ReadingPacingEngine.paginateText(fullText, widthDp, heightDp, fontSizeSp)
+                val words = fullText.split("\\s+".toRegex()).count { it.isNotBlank() }
+                _totalPages.value = pages.size
+                _contentState.value = ReaderContent.Text(pages, words)
+            } else {
+                _contentState.value = ReaderContent.Text(listOf("The scroll is empty."), 0)
             }
         } catch (e: Exception) {
             _contentState.value = ReaderContent.Error("Error reading archives: ${e.localizedMessage}")
@@ -179,7 +219,6 @@ class ReaderViewModel @Inject constructor(
     fun onPageChanged(newPage: Int) {
         val total = _totalPages.value
         val clamped = newPage.coerceIn(0, (total - 1).coerceAtLeast(0))
-        val prevPage = _currentPage.value
         _currentPage.value = clamped
 
         // Compute reading speed telemetry
@@ -187,7 +226,6 @@ class ReaderViewModel @Inject constructor(
         val deltaSeconds = (now - lastPageTurnTime) / 1000f
         lastPageTurnTime = now
 
-        // Estimate words on the read page (~250 words per page standard)
         val estimatedWords = 250
         wordsReadInSession += estimatedWords
 
@@ -206,6 +244,7 @@ class ReaderViewModel @Inject constructor(
     }
 
     suspend fun getPageBitmap(index: Int): Bitmap? = withContext(Dispatchers.Default) {
+        bitmapCache.get(index)?.let { return@withContext it }
         val renderer = pdfRenderer ?: return@withContext null
         try {
             synchronized(renderer) {
@@ -213,6 +252,7 @@ class ReaderViewModel @Inject constructor(
                 renderer.openPage(index).use { page ->
                     val bitmap = Bitmap.createBitmap(page.width * 2, page.height * 2, Bitmap.Config.ARGB_8888)
                     page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    bitmapCache.put(index, bitmap)
                     bitmap
                 }
             }
@@ -257,6 +297,7 @@ class ReaderViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         persistProgress()
+        bitmapCache.evictAll()
         pdfRenderer?.close()
         pfd?.close()
         File(context.cacheDir, "active_reader.pdf").delete()

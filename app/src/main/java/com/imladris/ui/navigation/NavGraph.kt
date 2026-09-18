@@ -35,7 +35,7 @@ fun ImladrisNavGraph(navController: NavHostController) {
             HallOfImladrisScreen(
                 onArtifactClick = { title, uri ->
                     val safeTitle = URLEncoder.encode(title, StandardCharsets.UTF_8.toString())
-                    val safeUri = Base64.encodeToString(uri.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP)
+                    val safeUri = Base64.encodeToString(uri.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
                     navController.navigate("reader/$safeTitle/$safeUri")
                 },
                 onSettingsClick = {
@@ -47,7 +47,7 @@ fun ImladrisNavGraph(navController: NavHostController) {
             LibraryScreen(
                 onArtifactClick = { title, uri ->
                     val safeTitle = URLEncoder.encode(title, StandardCharsets.UTF_8.toString())
-                    val safeUri = Base64.encodeToString(uri.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP)
+                    val safeUri = Base64.encodeToString(uri.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
                     navController.navigate("reader/$safeTitle/$safeUri")
                 }
             )
@@ -56,7 +56,7 @@ fun ImladrisNavGraph(navController: NavHostController) {
             KnowledgeGraphScreen(
                 onArtifactClick = { title, uri ->
                     val safeTitle = URLEncoder.encode(title, StandardCharsets.UTF_8.toString())
-                    val safeUri = Base64.encodeToString(uri.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP)
+                    val safeUri = Base64.encodeToString(uri.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
                     navController.navigate("reader/$safeTitle/$safeUri")
                 }
             )
@@ -80,7 +80,19 @@ fun ImladrisNavGraph(navController: NavHostController) {
             
             val safeUri = backStackEntry.arguments?.getString("uri")
             val uri = safeUri?.let { 
-                String(Base64.decode(it, Base64.URL_SAFE)) 
+                try {
+                    String(Base64.decode(it, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING))
+                } catch (e: Exception) {
+                    try {
+                        String(Base64.decode(it, Base64.DEFAULT))
+                    } catch (e2: Exception) {
+                        try {
+                            URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+                        } catch (e3: Exception) {
+                            it
+                        }
+                    }
+                }
             }
 
             ReaderScreen(

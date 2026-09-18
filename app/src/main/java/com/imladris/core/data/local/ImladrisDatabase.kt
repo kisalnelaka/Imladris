@@ -72,6 +72,9 @@ interface LibraryDao {
     @Query("SELECT * FROM artifacts WHERE id = :id")
     suspend fun getArtifactById(id: String): ArtifactEntity?
 
+    @Query("SELECT * FROM artifacts WHERE path = :path LIMIT 1")
+    suspend fun getArtifactByPath(path: String): ArtifactEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertReadingSession(session: ReadingSessionEntity): Long
 
