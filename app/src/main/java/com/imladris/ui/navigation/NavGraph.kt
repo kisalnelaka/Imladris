@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.imladris.feature.analytics.AnalyticsScreen
+import com.imladris.feature.graph.KnowledgeGraphScreen
 import com.imladris.feature.hall.HallOfImladrisScreen
 import com.imladris.feature.library.LibraryScreen
 import com.imladris.feature.reader.ReaderScreen
@@ -21,8 +22,9 @@ import android.util.Base64
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     object Hall : Screen("hall", "Sanctuary", Icons.Default.Home)
-    object Library : Screen("library", "Library", Icons.Default.List)
-    object Analytics : Screen("analytics", "Insights", Icons.Default.Info)
+    object Library : Screen("library", "Corridors", Icons.Default.AutoStories)
+    object Graph : Screen("graph", "Mind Palace", Icons.Default.Hub)
+    object Analytics : Screen("analytics", "Chronicle", Icons.Default.Timeline)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
 
@@ -43,6 +45,15 @@ fun ImladrisNavGraph(navController: NavHostController) {
         }
         composable(Screen.Library.route) {
             LibraryScreen(
+                onArtifactClick = { title, uri ->
+                    val safeTitle = URLEncoder.encode(title, StandardCharsets.UTF_8.toString())
+                    val safeUri = Base64.encodeToString(uri.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP)
+                    navController.navigate("reader/$safeTitle/$safeUri")
+                }
+            )
+        }
+        composable(Screen.Graph.route) {
+            KnowledgeGraphScreen(
                 onArtifactClick = { title, uri ->
                     val safeTitle = URLEncoder.encode(title, StandardCharsets.UTF_8.toString())
                     val safeUri = Base64.encodeToString(uri.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP)

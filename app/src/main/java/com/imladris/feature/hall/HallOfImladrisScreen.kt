@@ -38,6 +38,7 @@ fun HallOfImladrisScreen(
 ) {
     val recentlyOpened by hallViewModel.recentlyOpened.collectAsState(initial = emptyList())
     val recentlyAdded by hallViewModel.recentlyAdded.collectAsState(initial = emptyList())
+    val recommendations by hallViewModel.recommendations.collectAsState()
     
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -61,11 +62,11 @@ fun HallOfImladrisScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "My Library",
+                        text = "Hall of Imladris",
                         style = MaterialTheme.typography.displayLarge.copy(
                             fontWeight = FontWeight.SemiBold,
                             letterSpacing = 1.sp,
-                            fontSize = 36.sp
+                            fontSize = 34.sp
                         ),
                         color = SilverGlow
                     )
@@ -74,7 +75,15 @@ fun HallOfImladrisScreen(
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(28.dp))
+
+                if (recommendations.primary != null || recommendations.secondary != null) {
+                    RecommendationCluster(
+                        recommendationBundle = recommendations,
+                        onArtifactClick = onArtifactClick
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
                 
                 if (recentlyOpened.isNotEmpty()) {
                     LibrarySectionHeader("Continue Reading")

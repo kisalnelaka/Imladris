@@ -32,7 +32,12 @@ data class ArtifactEntity(
     val lastRead: Long,
     val addedDate: Long,
     val progress: Float,
-    val parentFolderId: String?
+    val parentFolderId: String?,
+    val lastPage: Int = 0,
+    val totalPages: Int = 1,
+    val wordCount: Int = 0,
+    val readingTimeMinutes: Int = 0,
+    val readingSpeedWpm: Float = 220f
 )
 
 @Entity(tableName = "highlights")
@@ -42,5 +47,27 @@ data class HighlightEntity(
     val content: String,
     val page: Int,
     val timestamp: Long,
-    val color: Int
+    val color: Int,
+    val note: String? = null
+)
+
+@Entity(
+    tableName = "reading_sessions",
+    foreignKeys = [
+        ForeignKey(
+            entity = ArtifactEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["artifactId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["artifactId"])]
+)
+data class ReadingSessionEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val artifactId: String,
+    val startTime: Long,
+    val durationMs: Long,
+    val wordsRead: Int,
+    val progressDelta: Float
 )

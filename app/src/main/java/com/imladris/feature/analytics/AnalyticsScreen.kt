@@ -31,6 +31,8 @@ fun AnalyticsScreen(
 ) {
     val artifactCount by viewModel.artifactCount.collectAsState(initial = 0)
     val focusScore by viewModel.focusScore.collectAsState(initial = 0)
+    val totalReadingMinutes by viewModel.totalReadingMinutes.collectAsState(initial = 0)
+    val streakDays by viewModel.readingStreakDays.collectAsState(initial = 1)
     val recentArtifacts by viewModel.recentArtifacts.collectAsState(initial = emptyList())
 
     MajesticBackground {
@@ -61,7 +63,7 @@ fun AnalyticsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
             ElvenDivider()
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             Row(modifier = Modifier.fillMaxWidth()) {
                 MajesticInsightCard(
@@ -78,8 +80,26 @@ fun AnalyticsScreen(
                     color = CelestialBlue
                 )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                MajesticInsightCard(
+                    title = "MINUTES IN FLOW",
+                    value = "$totalReadingMinutes",
+                    modifier = Modifier.weight(1f),
+                    color = EtherealTeal
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                MajesticInsightCard(
+                    title = "DAY STREAK",
+                    value = "${if (artifactCount > 0) streakDays else 0}d",
+                    modifier = Modifier.weight(1f),
+                    color = Champagne
+                )
+            }
             
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(44.dp))
             
             Text(
                 text = "RECENT PATHS",

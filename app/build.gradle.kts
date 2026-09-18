@@ -104,4 +104,7 @@ dependencies {
     
     // Graphics
     implementation("androidx.palette:palette-ktx:1.0.0")
+    
+    // Testing
+    testImplementation("junit:junit:4.13.2")
 }
