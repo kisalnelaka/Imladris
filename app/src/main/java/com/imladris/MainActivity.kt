@@ -3,13 +3,15 @@ package com.imladris
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.imladris.core.ui.theme.*
@@ -31,33 +33,64 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     bottomBar = {
                         if (currentRoute != null && !currentRoute.startsWith("reader")) {
-                            NavigationBar(
-                                containerColor = MidnightBlue.copy(alpha = 0.95f),
-                                contentColor = CelestialBlue,
-                                tonalElevation = 0.dp
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .navigationBarsPadding()
+                                    .padding(horizontal = 16.dp, vertical = 10.dp)
                             ) {
-                                items.forEach { screen ->
-                                    NavigationBarItem(
-                                        icon = { Icon(screen.icon, contentDescription = screen.title) },
-                                        label = { Text(screen.title, style = MaterialTheme.typography.labelSmall) },
-                                        selected = currentRoute == screen.route,
-                                        onClick = {
-                                            navController.navigate(screen.route) {
-                                                popUpTo(navController.graph.startDestinationId) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        },
-                                        colors = NavigationBarItemDefaults.colors(
-                                            selectedIconColor = CelestialBlue,
-                                            selectedTextColor = CelestialBlue,
-                                            unselectedIconColor = SilverGlow.copy(alpha = 0.4f),
-                                            unselectedTextColor = SilverGlow.copy(alpha = 0.4f),
-                                            indicatorColor = DeepMist
-                                        )
-                                    )
+                                Surface(
+                                    shape = RoundedCornerShape(24.dp),
+                                    color = Color(0xFF101520).copy(alpha = 0.94f),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, CelestialBlue.copy(alpha = 0.15f)),
+                                    tonalElevation = 6.dp,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    NavigationBar(
+                                        containerColor = Color.Transparent,
+                                        contentColor = CelestialBlue,
+                                        tonalElevation = 0.dp,
+                                        modifier = Modifier.height(64.dp)
+                                    ) {
+                                        items.forEach { screen ->
+                                            val selected = currentRoute == screen.route
+                                            NavigationBarItem(
+                                                icon = { 
+                                                    Icon(
+                                                        screen.icon, 
+                                                        contentDescription = screen.title,
+                                                        modifier = Modifier.size(20.dp)
+                                                    ) 
+                                                },
+                                                label = { 
+                                                    Text(
+                                                        screen.title, 
+                                                        style = MaterialTheme.typography.labelSmall.copy(
+                                                            fontSize = 10.sp,
+                                                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+                                                        )
+                                                    ) 
+                                                },
+                                                selected = selected,
+                                                onClick = {
+                                                    navController.navigate(screen.route) {
+                                                        popUpTo(navController.graph.startDestinationId) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                },
+                                                colors = NavigationBarItemDefaults.colors(
+                                                    selectedIconColor = CelestialBlue,
+                                                    selectedTextColor = CelestialBlue,
+                                                    unselectedIconColor = SilverGlow.copy(alpha = 0.45f),
+                                                    unselectedTextColor = SilverGlow.copy(alpha = 0.45f),
+                                                    indicatorColor = CelestialBlue.copy(alpha = 0.12f)
+                                                )
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }

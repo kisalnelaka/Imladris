@@ -5,42 +5,44 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.imladris.core.ui.theme.CelestialBlue
+import com.imladris.core.ui.theme.DeepMist
 import com.imladris.core.ui.theme.GlassBackground
 import com.imladris.core.ui.theme.GlassBorder
 
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(18.dp),
+    contentPadding: PaddingValues = PaddingValues(16.dp),
+    containerColor: Color = Color(0xFF121721).copy(alpha = 0.82f),
+    borderColor: Color = Color(0xFF79C0FF).copy(alpha = 0.18f),
     content: @Composable ColumnScope.() -> Unit
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(28.dp))
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        GlassBackground,
-                        Color.Transparent
-                    )
-                )
-            )
+            .clip(shape)
+            .background(containerColor)
             .border(
                 width = 1.dp,
-                brush = Brush.linearGradient(
+                brush = Brush.verticalGradient(
                     colors = listOf(
-                        GlassBorder,
-                        Color.Transparent
+                        borderColor,
+                        Color.White.copy(alpha = 0.04f)
                     )
                 ),
-                shape = RoundedCornerShape(28.dp)
+                shape = shape
             )
-            .padding(20.dp)
+            .padding(contentPadding)
     ) {
         Column {
             content()
@@ -51,15 +53,16 @@ fun GlassCard(
 @Composable
 fun EtherealGlow(
     modifier: Modifier = Modifier,
-    color: Color = Color(0xFF64FFDA),
+    color: Color = CelestialBlue,
+    sizeDp: Dp = 100.dp,
     content: @Composable () -> Unit
 ) {
-    Box(modifier = modifier, contentAlignment = androidx.compose.ui.Alignment.Center) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
-                .size(120.dp)
-                .blur(48.dp)
-                .background(color.copy(alpha = 0.25f), RoundedCornerShape(100))
+                .size(sizeDp)
+                .blur(36.dp)
+                .background(color.copy(alpha = 0.2f), RoundedCornerShape(100))
         )
         content()
     }
@@ -75,7 +78,7 @@ fun ImladrisDivider(modifier: Modifier = Modifier) {
                 Brush.horizontalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        Color(0xFFD4AF37).copy(alpha = 0.5f),
+                        CelestialBlue.copy(alpha = 0.4f),
                         Color.Transparent
                     )
                 )
