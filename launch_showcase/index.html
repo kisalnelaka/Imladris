@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMLADRIS • An Ethereal Knowledge Sanctuary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-midnight: #080C14;
+      --bg-deep: #0D131F;
+      --bg-card: rgba(14, 22, 36, 0.65);
+      --border-card: rgba(212, 175, 55, 0.25);
+      --border-mithril: rgba(100, 255, 218, 0.35);
+      --gold-primary: #D4AF37;
+      --gold-light: #F6E05E;
+      --silver-starlight: #E2E8F0;
+      --silver-muted: #94A3B8;
+      --mithril-teal: #58A6FF;
+      --emerald-hint: #2DD4BF;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-title: 'Cinzel', serif;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-midnight);
+      color: var(--silver-starlight);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Ambient Stardust Canvas */
+    #star-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header & Hero */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .elven-star-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      font-family: var(--font-serif);
+      font-size: 14px;
+      color: var(--gold-light);
+      margin-bottom: 24px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+    }
+
+    .main-title {
+      font-family: var(--font-title);
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--silver-starlight);
+      text-shadow: 0 0 30px rgba(88, 166, 255, 0.35);
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--gold-light);
+      max-width: 720px;
+      margin: 0 auto 16px;
+    }
+
+    .quote {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      color: var(--silver-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* Video Player Showcase */
+    .video-showcase-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(88, 166, 255, 0.1);
+      backdrop-filter: blur(16px);
+      margin-bottom: 56px;
+      position: relative;
+    }
+
+    .filigree-corners {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-color: var(--gold-primary);
+      pointer-events: none;
+    }
+    .filigree-tl { top: 12px; left: 12px; border-top: 2px solid; border-left: 2px solid; }
+    .filigree-tr { top: 12px; right: 12px; border-top: 2px solid; border-right: 2px solid; }
+    .filigree-bl { bottom: 12px; left: 12px; border-bottom: 2px solid; border-left: 2px solid; }
+    .filigree-br { bottom: 12px; right: 12px; border-bottom: 2px solid; border-right: 2px solid; }
+
+    .video-wrapper {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      aspect-ratio: 16 / 9;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .video-caption-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding: 0 8px;
+    }
+
+    .badge-specs {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--mithril-teal);
+      background: rgba(88, 166, 255, 0.1);
+      border: 1px solid rgba(88, 166, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    /* Interactive Graph Simulation Section */
+    .section-title {
+      font-family: var(--font-title);
+      font-size: 1.8rem;
+      letter-spacing: 0.1em;
+      color: var(--silver-starlight);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .section-desc {
+      text-align: center;
+      color: var(--silver-muted);
+      font-family: var(--font-serif);
+      font-style: italic;
+      margin-bottom: 32px;
+      font-size: 1.05rem;
+    }
+
+    .interactive-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-mithril);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      margin-bottom: 56px;
+    }
+
+    #graph-canvas {
+      width: 100%;
+      height: 480px;
+      border-radius: 12px;
+      background: radial-gradient(circle at center, #0F172A 0%, #080C14 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: grab;
+      display: block;
+    }
+    #graph-canvas:active {
+      cursor: grabbing;
+    }
+
+    .graph-instructions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--silver-muted);
+    }
+
+    /* Pillars Grid */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 56px;
+    }
+
+    .pillar-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(12px);
+    }
+    .pillar-card:hover {
+      border-color: var(--gold-primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(212, 175, 55, 0.15);
+    }
+
+    .pillar-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      color: var(--gold-light);
+    }
+
+    .pillar-title {
+      font-family: var(--font-title);
+      font-size: 1.15rem;
+      letter-spacing: 0.08em;
+      color: var(--silver-starlight);
+      margin-bottom: 10px;
+    }
+
+    .pillar-text {
+      font-size: 0.95rem;
+      color: var(--silver-muted);
+      line-height: 1.7;
+    }
+
+    /* Code Banner & Footer */
+    .cta-card {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(88, 166, 255, 0.10) 100%);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 40px 32px;
+      text-align: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .clone-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      color: var(--gold-light);
+      margin-top: 20px;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-light);
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover {
+      background: var(--gold-primary);
+      color: #000;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      color: var(--silver-muted);
+      font-family: var(--font-serif);
+      font-size: 14px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="star-canvas"></canvas>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="elven-star-badge">
+        <span>✦</span> The Sovereign Mind Palace <span>✦</span>
+      </div>
+      <h1 class="main-title">IMLADRIS</h1>
+      <p class="subtitle">An Ethereal, Offline-First Knowledge Sanctuary</p>
+      <p class="quote">“The Last Homely House East of the Sea”</p>
+    </header>
+
+    <!-- Launch Video Showcase -->
+    <section class="video-showcase-section">
+      <div class="filigree-corners filigree-tl"></div>
+      <div class="filigree-corners filigree-tr"></div>
+      <div class="filigree-corners filigree-bl"></div>
+      <div class="filigree-corners filigree-br"></div>
+
+      <div class="video-wrapper">
+        <video id="launch-video" controls poster="../docs/assets/feature_graphic.png">
+          <source src="../assets/imladris_launch.mp4" type="video/mp4">
+          Your browser does not support HTML5 video.
+        </video>
+      </div>
+
+      <div class="video-caption-bar">
+        <div>
+          <strong style="color: var(--gold-light); font-family: var(--font-serif);">Official 1080p 60FPS Launch Showcase</strong>
+          <span style="color: var(--silver-muted); margin-left: 10px; font-size: 14px;">Full HD Cinematic Presentation</span>
+        </div>
+        <div class="badge-specs">1920x1080 • 60 FPS • Ethereal Audio</div>
+      </div>
+    </section>
+
+    <!-- Live Interactive Knowledge Graph -->
+    <h2 class="section-title">THE CONSTELLATION OF THOUGHT</h2>
+    <p class="section-desc">Interactive Spring-Electrical Graph Simulation (Pure Coulomb-Hooke Equilibrium)</p>
+
+    <div class="interactive-card">
+      <canvas id="graph-canvas"></canvas>
+      <div class="graph-instructions">
+        <span>✦ Click & drag any star node to disturb equilibrium • Observe kinetic relaxation</span>
+        <span class="badge-specs">Repulsion: 12000 | Stiffness: 0.04</span>
+      </div>
+    </div>
+
+    <!-- Architectural Pillars -->
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon">⚜</div>
+        <h3 class="pillar-title">Spatial Gateways</h3>
+        <p class="pillar-text">Navigate folders as glowing dimensional portals. Each collection is an ancient realm where documents rest as luminous artifacts.</p>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">✧</div>
+        <h3 class="pillar-title">Focus Mode Reader</h3>
+        <p class="pillar-text">All chrome, navigation, and notifications softly dissolve into twilight mist. Pure Playfair Display serif typography with adaptive circadian warmth.</p>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">✦</div>
+        <h3 class="pillar-title">Sovereign & Offline</h3>
+        <p class="pillar-text">Zero telemetry, zero trackers, zero cloud dependencies. Your knowledge remains strictly yours, forever preserved in local Room storage.</p>
+      </div>
+    </div>
+
+    <!-- Call to Action -->
+    <section class="cta-card">
+      <h2 style="font-family: var(--font-title); color: var(--silver-starlight); font-size: 1.8rem; margin-bottom: 8px;">ENTER THE SANCTUARY</h2>
+      <p style="font-family: var(--font-serif); font-style: italic; color: var(--gold-light);">Built with Kotlin, Jetpack Compose, and pure mathematical discipline.</p>
+
+      <div class="clone-box">
+        <code>git clone https://github.com/kisalnelaka/imladris.git</code>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText('git clone https://github.com/kisalnelaka/imladris.git'); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 2000)">Copy</button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      “Deep roots are not reached by the frost; the old that is strong does not wither.”
+    </footer>
+  </div>
+
+  <script>
+    // 1. Ambient Stardust Canvas
+    const starCanvas = document.getElementById('star-canvas');
+    const sCtx = starCanvas.getContext('2d');
+    let width = starCanvas.width = window.innerWidth;
+    let height = starCanvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = starCanvas.width = window.innerWidth;
+      height = starCanvas.height = window.innerHeight;
+    });
+
+    const particles = Array.from({ length: 90 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: -0.2 - Math.random() * 0.4,
+      radius: 0.8 + Math.random() * 2.2,
+      phase: Math.random() * Math.PI * 2
+    }));
+
+    function renderStars() {
+      sCtx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.phase += 0.02;
+        if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+
+        const shimmer = 0.4 + 0.6 * Math.sin(p.phase);
+        sCtx.fillStyle = `rgba(246, 224, 94, ${0.45 * shimmer})`;
+        sCtx.beginPath();
+        sCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        sCtx.fill();
+      });
+      requestAnimationFrame(renderStars);
+    }
+    renderStars();
+
+    // 2. Interactive Force-Directed Knowledge Graph Simulation
+    const gCanvas = document.getElementById('graph-canvas');
+    const gCtx = gCanvas.getContext('2d');
+    let gw, gh;
+
+    function resizeGraph() {
+      gw = gCanvas.width = gCanvas.clientWidth * window.devicePixelRatio;
+      gh = gCanvas.height = gCanvas.clientHeight * window.devicePixelRatio;
+    }
+    resizeGraph();
+    window.addEventListener('resize', resizeGraph);
+
+    const graphNodes = [
+      { name: "Elder Lore", x: 0.5, y: 0.5, vx: 0, vy: 0, r: 28, prog: 0.88, pinned: true },
+      { name: "Sindarin Philology", x: 0.38, y: 0.35, vx: 0, vy: 0, r: 20, prog: 0.65, pinned: false },
+      { name: "Silmaril Lore", x: 0.62, y: 0.33, vx: 0, vy: 0, r: 24, prog: 0.94, pinned: false },
+      { name: "Mind & Memory", x: 0.36, y: 0.65, vx: 0, vy: 0, r: 18, prog: 0.42, pinned: false },
+      { name: "Celestial Maps", x: 0.64, y: 0.66, vx: 0, vy: 0, r: 22, prog: 0.72, pinned: false },
+      { name: "Hymns of Elbereth", x: 0.50, y: 0.22, vx: 0, vy: 0, r: 17, prog: 0.50, pinned: false },
+      { name: "Haven Cartography", x: 0.50, y: 0.78, vx: 0, vy: 0, r: 18, prog: 0.35, pinned: false },
+    ];
+
+    const graphEdges = [
+      [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6],
+      [1, 5], [2, 5], [3, 6], [4, 6], [1, 3], [2, 4]
+    ];
+
+    // Initialize absolute positions
+    graphNodes.forEach(n => {
+      n.ax = n.x * gw;
+      n.ay = n.y * gh;
+    });
+
+    let draggedNode = null;
+
+    gCanvas.addEventListener('mousedown', (e) => {
+      const rect = gCanvas.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * window.devicePixelRatio;
+      const my = (e.clientY - rect.top) * window.devicePixelRatio;
+      draggedNode = graphNodes.find(n => Math.hypot(n.ax - mx, n.ay - my) < n.r * 1.6);
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!draggedNode) return;
+      const rect = gCanvas.getBoundingClientRect();
+      draggedNode.ax = (e.clientX - rect.left) * window.devicePixelRatio;
+      draggedNode.ay = (e.clientY - rect.top) * window.devicePixelRatio;
+      draggedNode.vx = 0;
+      draggedNode.vy = 0;
+    });
+
+    window.addEventListener('mouseup', () => { draggedNode = null; });
+
+    function renderGraph() {
+      gCtx.clearRect(0, 0, gw, gh);
+      const dt = 0.02;
+      const kRep = 14000 * (window.devicePixelRatio);
+      const kSpring = 0.04;
+      const targetLen = 130 * window.devicePixelRatio;
+
+      // Physics step
+      for (let i = 0; i < graphNodes.length; i++) {
+        const ni = graphNodes[i];
+        if (ni === draggedNode) continue;
+        let fx = 0, fy = 0;
+
+        for (let j = 0; j < graphNodes.length; j++) {
+          if (i === j) continue;
+          const nj = graphNodes[j];
+          const dx = ni.ax - nj.ax;
+          const dy = ni.ay - nj.ay;
+          const distSq = dx * dx + dy * dy + 100;
+          const dist = Math.sqrt(distSq);
+          const force = kRep / distSq;
+          fx += (dx / dist) * force;
+          fy += (dy / dist) * force;
+        }
+
+        // Center gravity
+        fx -= (ni.ax - gw / 2) * 0.015;
+        fy -= (ni.ay - gh / 2) * 0.015;
+
+        ni.vx = (ni.vx + fx * dt) * 0.85;
+        ni.vy = (ni.vy + fy * dt) * 0.85;
+      }
+
+      // Spring tension
+      graphEdges.forEach(([u, v]) => {
+        const nu = graphNodes[u];
+        const nv = graphNodes[v];
+        const dx = nv.ax - nu.ax;
+        const dy = nv.ay - nu.ay;
+        const dist = Math.hypot(dx, dy) || 1;
+        const displacement = dist - targetLen;
+        const force = displacement * kSpring;
+
+        if (nu !== draggedNode) {
+          nu.vx += (dx / dist) * force * dt;
+          nu.vy += (dy / dist) * force * dt;
+        }
+        if (nv !== draggedNode) {
+          nv.vx -= (dx / dist) * force * dt;
+          nv.vy -= (dy / dist) * force * dt;
+        }
+      });
+
+      // Update positions
+      graphNodes.forEach(n => {
+        if (n !== draggedNode) {
+          n.ax += n.vx;
+          n.ay += n.vy;
+        }
+      });
+
+      // Draw Edges
+      graphEdges.forEach(([u, v]) => {
+        const nu = graphNodes[u];
+        const nv = graphNodes[v];
+        gCtx.strokeStyle = 'rgba(88, 166, 255, 0.25)';
+        gCtx.lineWidth = 1.5 * window.devicePixelRatio;
+        gCtx.beginPath();
+        gCtx.moveTo(nu.ax, nu.ay);
+        gCtx.lineTo(nv.ax, nv.ay);
+        gCtx.stroke();
+      });
+
+      // Draw Nodes
+      const now = performance.now() * 0.002;
+      graphNodes.forEach((n, idx) => {
+        const pulse = 1.0 + 0.08 * Math.sin(now * 2 + idx);
+        const rad = n.r * window.devicePixelRatio * pulse;
+
+        // Glow
+        gCtx.fillStyle = 'rgba(88, 166, 255, 0.18)';
+        gCtx.beginPath();
+        gCtx.arc(n.ax, n.ay, rad * 1.8, 0, Math.PI * 2);
+        gCtx.fill();
+
+        // Node circle
+        gCtx.fillStyle = '#0F172A';
+        gCtx.beginPath();
+        gCtx.arc(n.ax, n.ay, rad, 0, Math.PI * 2);
+        gCtx.fill();
+
+        // Progress ring
+        gCtx.strokeStyle = '#D4AF37';
+        gCtx.lineWidth = 2.5 * window.devicePixelRatio;
+        gCtx.beginPath();
+        gCtx.arc(n.ax, n.ay, rad, -Math.PI / 2, -Math.PI / 2 + n.prog * Math.PI * 2);
+        gCtx.stroke();
+
+        // Label
+        gCtx.font = `${12 * window.devicePixelRatio}px "Cinzel", serif`;
+        gCtx.fillStyle = '#E2E8F0';
+        gCtx.textAlign = 'center';
+        gCtx.fillText(n.name, n.ax, n.ay + rad + 18 * window.devicePixelRatio);
+      });
+
+      requestAnimationFrame(renderGraph);
+    }
+    renderGraph();
+  </script>
+</body>
+</html>
